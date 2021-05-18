@@ -69,14 +69,7 @@ tar -xf ../cpan.tar
 rm -f ../cpan.tar
 
 cd /root/cpan
-ls -Sp *.gz >/root/cpan_list.txt
-cd /root/cpan
-
-echo "b3BlbihGSCwgJzwnLCAnL3Jvb3QvY3Bhbl9saXN0LnR4dCcpOwp3aGlsZSAoPEZIPikgewogICRm
-aWxlID0gJF87CiAgY2hvbXAgJGZpbGU7CiAgcHJpbnQgIiRmaWxlXG4iOwogICRvayA9IHN5c3Rl
-bSgiY3Bhbm0gLS1taXJyb3IgZmlsZTovLy9yb290L2NwYW4gL3Jvb3QvY3Bhbi8kZmlsZSIpOwog
-IGlmICggJG9rICE9IDAgKSB7CiAgICBwcmludCBTVERFUlIgIkZBSUxFRCA9PiAkZmlsZVxuIjsK
-ICB9Cn0K" | base64 -d | perl
+curl -L https://github.com/squizzster/ginstall/raw/master/install_cpan.pl | perl
 
 cd /root
 
