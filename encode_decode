@@ -1,0 +1,58 @@
+#!/usr/local/bin/perl
+use strict;
+use Crypt::CBC;
+use Crypt::RC4::XS;
+my $version = "v1.0";
+my $secret_file = '/root/.ccrypt.gbooking';
+my ($crypt_1, $crypt_2);
+
+exit 1 if not check_file_permissions();
+exit 1 if not check_password_sizes();
+exit 1 if not encrypt_or_decrypt();
+exit 0;
+
+sub encrypt_or_decrypt {
+  my $cipher = Crypt::CBC->new( -pass   => $crypt_1,
+                                -cipher => 'Cipher::AES',
+                                -pbkdf  => 'pbkdf2',
+                                -iter   => 131072,
+                              );
+  my $buffer;
+  my $header = "_____g_booking_password_encrypted_file_$version\_____";
+  my $tmp_bytes  = read (STDIN, my $header_buffer, length($header));
+  
+  if ( $header_buffer eq $header ) {
+    my $bytes      = read (STDIN, my $encrypted_text, 462144000);
+    print $cipher->decrypt(RC4($crypt_2, pack("H*", $encrypted_text) ));
+    return 1;
+  }
+  else {
+    my $bytes  = read (STDIN, my $tmp_buffer, 262144000);
+    if ( $bytes >= 262144000 ) {
+      print STDERR "Sorry, this file is too large - we only support files up to 250mb in size - this is designed for publicly facing scripts only.";
+      exit 1;
+    }
+    print $header;
+    print  unpack("H*", RC4($crypt_2, $cipher->encrypt($header_buffer . $tmp_buffer) )); 
+    return 1;
+  }
+}
+
+
+sub check_file_permissions {
+  my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, $atime,$mtime,$ctime,$blksize,$blocks) = stat($secret_file);
+  return 1 if $mode == 32768 && $uid == 0 && $gid == 0;
+  print STDERR "The secret file has the wrong permissions. Normal file with chmod 000, root/root please.\n";
+  return;
+}
+
+sub check_password_sizes {
+  open(my $fh, '<', '/root/.ccrypt.gbooking');
+  $crypt_1 = <$fh>;
+  $crypt_2 = <$fh>;
+  chomp $crypt_1;
+  chomp $crypt_2;
+  return 1 if length($crypt_1) == 512 && length($crypt_2) == 512;
+  print STDERR "The secret file passwords must be both 512 characters long\n";
+  return;
+}
