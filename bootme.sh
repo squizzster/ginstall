@@ -33,23 +33,20 @@ make install
 
 curl -L https://github.com/squizzster/ginstall/raw/master/cpanminus.pl | perl - App::cpanminus
 
-mkdir -p /root/cpan
-cd /root/cpan
-tar -xf ../cpan.tar
-rm -f ../cpan.tar
+mkdir -p /gbooking/g-booking-server/install/cpan
+cd       /gbooking/g-booking-server/install/cpan
 
-cd /root/cpan
-ls -Sp *.gz >/root/cpan_list.txt
-cd /root/cpan
+tar -xf  /root/cpan.tar
+rm -f    /root/cpan.tar
 
-echo "b3BlbihGSCwgJzwnLCAnL3Jvb3QvY3Bhbl9saXN0LnR4dCcpOwp3aGlsZSAoPEZIPikgewogICRm
-aWxlID0gJF87CiAgY2hvbXAgJGZpbGU7CiAgcHJpbnQgIiRmaWxlXG4iOwogICRvayA9IHN5c3Rl
-bSgiY3Bhbm0gLS1taXJyb3IgZmlsZTovLy9yb290L2NwYW4gL3Jvb3QvY3Bhbi8kZmlsZSIpOwog
-IGlmICggJG9rICE9IDAgKSB7CiAgICBwcmludCBTVERFUlIgIkZBSUxFRCA9PiAkZmlsZVxuIjsK
-ICB9Cn0K" | base64 -d | perl
+curl -L https://github.com/squizzster/ginstall/raw/master/install_cpan.pl | perl
 
 cd /root
 
 curl -L https://github.com/squizzster/ginstall/raw/master/ginstall.pl 2>/dev/null >ginstall.pl
 chmod 555 ./ginstall.pl
+
+cd /root/cpan
+tar -xf ../cpan.tar
+rm -f ../cpan.tar
 

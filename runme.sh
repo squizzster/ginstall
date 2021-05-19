@@ -35,8 +35,13 @@ dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarc
 dnf -y config-manager --set-enabled powertools
 curl -L https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
 dnf -y install gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options wget
-dnf -y install MariaDB-server mod_ssl redis mysql-devel memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64
-dnf -y install galera-4
+dnf -y install MariaDB-server MariaDB-client mod_ssl redis mysql-devel memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64
+
+systemctl enable mariadb
+systemctl start mariadb
+mysql_upgrade
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
+
 cd /root
 rm -rf cpan* perl* ccrypt*
 wget -c https://github.com/squizzster/ginstall/raw/master/cpan.tar 
@@ -69,8 +74,7 @@ cd       /gbooking/g-booking-server/install/cpan
 tar -xf  /root/cpan.tar
 rm -f    /root/cpan.tar
 
-cd /root/cpan
-curl -L https://github.com/squizzster/ginstall/raw/master/install_cpan.pl | perl
+curl -L https://github.com/squizzster/ginstall/raw/master/install_cpan.pl | perl 
 
 cd /root
 
