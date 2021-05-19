@@ -9,20 +9,69 @@ cpan();
 
 foreach my $cpan_module (@cpan) {
   print "Attempting [$cpan_module]....";
+  ###print "OK\n" if check_and_create($cpan_module);
+  if ( not eval_and_install($cpan_module) ) {
+    print "Attempting download of [$cpan_module]...";
+    check_and_create($cpan_module);
+    print "RE-attempting [$cpan_module]....";
+    eval_and_install($cpan_module); 
+  }
+}
+
+
+sub eval_and_install {
+  my $cpan_module = $_[0];
+  print "Checking [$cpan_module]...";
   eval "use $cpan_module;";
   if ( $@ ) {
     $count++;
-    print "Installing  ($count)  [$cpan_module]..\n";
-    my $ok = system("cpanm --mirror file:///root/cpan $cpan_module");
+    print "it failed. Attemtping install...";
+    my $ok = system("cpanm --mirror file:///gbooking/g-booking-server/install/cpan $cpan_module");
     if ( $ok != 0 ) {
-       print STDOUT "FAILED => $cpan_module\n";
-       print STDERR "FAILED => $cpan_module\n";
+       print "FAILED.\n";
+       return;
     }
   }
   else {
-    print "OK!\n";
+    print "it's good.\n";
   }
+  return 1;
 }
+
+
+
+sub check_and_create {
+  my $cpan_module = $_[0];
+  my $ok = `/usr/local/bin/cpanm --info $cpan_module`;
+  chomp $ok;
+  $ok=~/(.*?)\/(.*?)$/;
+
+  if ( $1 ) {
+    my $download   = "https://cpan.metacpan.org/authors/id/" .  substr($1,0,1) . "/" . substr($1,0,2) . "/" . $ok;
+    my $local_dir  = "/gbooking/g-booking-server/install/cpan/authors/id" . "/" . substr($1,0,1) . "/" . substr($1,0,2) . "/" . $1;
+    my $local_file = "/gbooking/g-booking-server/install/cpan/authors/id" . "/" . substr($1,0,1) . "/" . substr($1,0,2) . "/" . $1 . "/$2";
+
+    mkdir "/gbooking/g-booking-server/install/cpan";
+    mkdir "/gbooking/g-booking-server/install/cpan/authors/";
+    mkdir "/gbooking/g-booking-server/install/cpan/authors/id";
+    mkdir "/gbooking/g-booking-server/install/cpan/authors/id" . "/" . substr($1,0,1);
+    mkdir "/gbooking/g-booking-server/install/cpan/authors/id" . "/" . substr($1,0,1) . "/" . substr($1,0,2);
+    mkdir "/gbooking/g-booking-server/install/cpan/authors/id" . "/" . substr($1,0,1) . "/" . substr($1,0,2) . "/" . $1;
+
+    if ( !-e $local_file ) {
+      print "...DOWNLOADING...";
+      my $exit = system ("curl -L '$download' >$local_file 2>/dev/null");
+      if ( $exit != 0) {
+        print "ERROR! $download\n";
+        return;
+      }
+    }
+  }
+  print "DOWNLOAD SAYS OK!";
+  return 1;
+}
+
+
 
 sub cpan {
   @cpan = (
@@ -61,7 +110,6 @@ sub cpan {
    'Digest::SHA3',
    'Email::SendGrid::V3',
    'Encode',
-   'Errno',
    'ExtUtils::Installed',
    'ExtUtils::Packlist',
    'Fcntl',
@@ -96,7 +144,6 @@ sub cpan {
    'Mojo::Redis',
    'Mojo::Transaction::WebSocket',
    'Net::SSLeay',
-   'open',
    'Perl::Critic',
    'Perl::MinimumVersion',
    'POSIX',
