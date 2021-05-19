@@ -34,13 +34,15 @@ dnf -y upgrade
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 dnf -y config-manager --set-enabled powertools
 curl -L https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
-dnf -y install gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options wget
+dnf -y install firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options wget
 dnf -y install MariaDB-server MariaDB-client mod_ssl redis mysql-devel memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64
 
 systemctl enable mariadb
 systemctl start mariadb
 mysql_upgrade
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
+systemctl enable firewalld 
+systemctl start firewalld
 
 cd /root
 rm -rf cpan* perl* ccrypt*
