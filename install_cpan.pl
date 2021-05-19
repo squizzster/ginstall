@@ -172,6 +172,7 @@ sub cpan {
    'utf8::all',
    'WWW::Google::APIDiscovery',
    'WWW::Telegram::BotAPI',
+   'DBD::MariaDB',
    'YAML'
   );
 }
