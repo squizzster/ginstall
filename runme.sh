@@ -63,10 +63,11 @@ make install
 
 curl -L https://github.com/squizzster/ginstall/raw/master/cpanminus.pl | perl - App::cpanminus
 
-mkdir -p /root/cpan
-cd /root/cpan
-tar -xf ../cpan.tar
-rm -f ../cpan.tar
+mkdir -p /gbooking/g-booking-server/install/cpan
+cd       /gbooking/g-booking-server/install/cpan
+
+tar -xf  /root/cpan.tar
+rm -f    /root/cpan.tar
 
 cd /root/cpan
 curl -L https://github.com/squizzster/ginstall/raw/master/install_cpan.pl | perl
