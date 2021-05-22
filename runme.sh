@@ -42,7 +42,6 @@ systemctl start mariadb
 mysql_upgrade
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
 systemctl enable firewalld 
-systemctl start firewalld
 
 cd /root
 rm -rf cpan* perl* ccrypt*
@@ -104,3 +103,6 @@ PHASE 1 installation complete.
 
 to complete the installation.
 "
+
+systemctl start firewalld
+

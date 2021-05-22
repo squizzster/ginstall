@@ -17,6 +17,17 @@ foreach my $cpan_module (@cpan) {
   }
 }
 
+## and repeat
+foreach my $cpan_module (@cpan) {
+  print "Attempting [$cpan_module]....";
+  if ( not eval_and_install($cpan_module) ) {
+    #print "Attempting download of [$cpan_module]...";
+    #check_and_create($cpan_module);
+    #print "RE-attempting [$cpan_module]....";
+    #eval_and_install($cpan_module); 
+  }
+}
+
 
 sub eval_and_install {
   my $cpan_module = $_[0];
@@ -173,6 +184,7 @@ sub cpan {
    'WWW::Google::APIDiscovery',
    'WWW::Telegram::BotAPI',
    'DBD::MariaDB',
+   'LWP::UserAgent::Patch::Retry',
    'YAML'
   );
 }
