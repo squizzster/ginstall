@@ -39,7 +39,11 @@ dnf -y install MariaDB-server MariaDB-client mod_ssl redis mysql-devel memcached
 
 systemctl enable mariadb
 systemctl start mariadb
-mysql_upgrade
+ECHO "Adding mysql";
+nohup mysql_upgrade &
+sleep 20;
+ECHO "Adding zones";
+
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
 systemctl enable firewalld 
 
