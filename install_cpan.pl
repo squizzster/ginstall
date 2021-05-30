@@ -86,6 +86,7 @@ sub check_and_create {
 sub cpan {
   @cpan = (
    'autodie',
+   'Crypt::OpenSSL::AES',
    'Capture::Tiny',
    'Carp',
    'Code::ART',
