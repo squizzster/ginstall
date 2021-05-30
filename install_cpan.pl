@@ -98,6 +98,7 @@ sub cpan {
    'Crypt::PRNG',
    'Crypt::RC4',
    'Crypt::RC4::XS',
+   'LWP::UserAgent::Patch::Retry',
    'Crypt::Rijndael',
    'Crypt::ScryptKDF',
    'Cwd',
@@ -185,7 +186,6 @@ sub cpan {
    'WWW::Google::APIDiscovery',
    'WWW::Telegram::BotAPI',
    'DBD::MariaDB',
-   'LWP::UserAgent::Patch::Retry',
    'YAML'
   );
 }

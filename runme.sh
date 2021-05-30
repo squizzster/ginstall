@@ -50,7 +50,7 @@ systemctl enable firewalld
 cd /root
 rm -rf cpan* perl* ccrypt*
 wget -c https://github.com/squizzster/ginstall/raw/master/cpan.tar 
-wget -c https://github.com/squizzster/ginstall/raw/master/perl-5.32.1.tar.gz
+wget -c https://g-booking.fra1.digitaloceanspaces.com/public/perl-5.34.0.tar.gz
 wget -c https://github.com/squizzster/ginstall/raw/master/ccrypt-1.11.tar.gz
 
 gzip -fd ccrypt-1.11.tar.gz
@@ -61,9 +61,9 @@ make
 make install
 cd ..
 
-gzip -d perl-5.32.1.tar.gz
-tar -xf perl-5.32.1.tar
-cd perl-5.32.1
+gzip -d perl-5.34.0.tar.gz
+tar -xf perl-5.34.0.tar
+cd perl-5.34.0
 
 sh Configure -de
 
