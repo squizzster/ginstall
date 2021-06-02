@@ -98,6 +98,7 @@ sub check_and_create {
 
 sub cpan {
   @cpan = (
+   'Test::Needs',
    'autodie',
    'Crypt::OpenSSL::AES',
    'Capture::Tiny',
