@@ -19,13 +19,13 @@ Log::Log4perl->easy_init( {
        file     => "STDOUT",
 });
 
-my $gbooking_emergency_ip = "";
-my $host_name = get_my_hostname();
+## Let's get some basic stuff... 
+## ... and add a fall-back IP incase something fails as we boot with FIREWALL FULL LOCKDOWN 
+my $emergency_ip_no = add_emergency_ip();
+my $host_name       = get_my_hostname ();
+my $my_server_ip_no = get_ipify       ();
 
-INFO "Server [$host_name} has rebooted."; sleep 1;
-
-add_emergency_ip();
-
+INFO "Server ($host_name) with IP [$my_server_ip_no] has rebooted."; 
 
 
 
@@ -37,19 +37,31 @@ sub get_my_hostname {
   }
   catch {
   }
+  WARN "Could not get the hostname of the server, assigning 'invalid'.";
   return "invalid.unknown.g-booking.com";
 }
 
 
+sub get_ipify {
+  my $ipno = `/usr/bin/curl -s 'https://api.ipify.org'`;
+  while ( not $ipno =~m/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/ ) {
+    WARN "Failed to get my IP address from https://api.ipify.org [$ipno]";
+    sleep 1;
+    $ipno = `/usr/bin/curl -s 'https://api.ipify.org'`;
+  }
+  return $ipno;
+}
+
 
 sub add_emergency_ip {
-  INFO "Adding an emergency firewall IP number";
-  while ( not $gbooking_emergency_ip =~m/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/ ) {
-    $gbooking_emergency_ip = get_emergency_ip();
+  my $ipno = get_emergency_ip();
+  while ( not $ipno =~m/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/ ) {
+    $ipno = get_emergency_ip();
   }
-  firewall_cmd ( "--permanent --zone=public --add-rich-rule='  rule family=\"ipv4\"  source address=\"$gbooking_emergency_ip\"   port protocol=\"tcp\" port=\"22\" accept'" );
+  firewall_cmd ( "--permanent --zone=public --add-rich-rule='  rule family=\"ipv4\"  source address=\"$ipno\"   port protocol=\"tcp\" port=\"22\" accept'" );
   system_ctl   ( "reload", "firewalld" );
-  INFO "I've added emergency IP [$gbooking_emergency_ip] into the firewall table and reloaded the firewall.";
+  INFO "I've added emergency IP [$ipno] into the firewall table and reloaded the firewall.";
+  return $ipno; 
 }
 
 
@@ -58,7 +70,7 @@ sub get_emergency_ip {
     return inet_ntoa(inet_aton('emergency.g-booking.com'));
   }
   catch {
-    WARN "Emergency address error. $@";
+    WARN "Emergency IP address error. $@";
     sleep 2;
     return "";
   }
