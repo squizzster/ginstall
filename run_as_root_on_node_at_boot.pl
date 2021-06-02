@@ -42,7 +42,7 @@ sub get_my_hostname {
 
 
 
-sub add_emergecy_ip {
+sub add_emergency_ip {
   INFO "Adding an emergency firewall IP number";
   while ( not $gbooking_emergency_ip =~m/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/ ) {
     $gbooking_emergency_ip = get_emergency_ip();
