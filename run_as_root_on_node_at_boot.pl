@@ -71,7 +71,7 @@ sub firewall_cmd {
 
 
 sub system_ctl {
-  return `/usr/bin/systemctl $_[0] $_[1]` if ( $_[0] and $_[1] ) or return; 
+  return `/usr/bin/systemctl $_[0] $_[1] 2>&1` if ( $_[0] and $_[1] ) or return; 
 }
 
 
