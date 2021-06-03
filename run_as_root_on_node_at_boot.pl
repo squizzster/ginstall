@@ -38,7 +38,7 @@ use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init( {
        layout   => '%d{yyyy-MM-dd HH:mm:ss} - %p - %F{1}-%L-%M - %m%n',
        level    => $INFO,
-       file     => "STDOUT",
+       file     => ">/var/log/run_as_root_on_node_at_boot.log",
 } ); 
 
 
