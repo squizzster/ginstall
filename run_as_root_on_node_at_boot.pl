@@ -59,16 +59,17 @@ sub main {
 
   my $server_id    = get_file( '/root/.server.id' );
   my $alive_secret = get_file( '/root/.ccrypt.gbooking.system.alive' );
+  my $tmp_secret =   get_file ( '/root/.secret.id' );
 
   if ( $server_id && $alive_secret ) {
     INFO "Server [$host_name] is already configured as g-booking server ID [$server_id].";
   }
-  else {
+  elsif ( !$server_id && !$tmp_secret ) {
     WARN "Server [$host_name] is currently unknown and not configured with g-booking.";
     first_time_check_in($my_server_ip_no, $host_name);
     $server_id    = get_file( '/root/.server.id' );
+    $tmp_secret = get_file ( '/root/.secret.id' );
   }
-  my $tmp_secret = get_file ( '/root/.secret.id' );
 
   if ( $server_id && !$alive_secret && $tmp_secret ) {
     INFO "We understand we are server ID [$server_id] however we're not fully configured, we'll try that now...";
