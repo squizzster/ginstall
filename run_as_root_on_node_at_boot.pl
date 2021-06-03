@@ -130,6 +130,9 @@ sub authenticated_check_in {
   ## OK, we've wrote out all the secret command files for server installation
   ## Encrpytion keys will follow in the next phase...
   ## So right now we have a bare arse server but she/he/binary (get it?) BAH!  understands a few things about life... 
+  system_ctl   ( "enable", "firewalld" );
+  system_ctl   ( "start",  "firewalld" );
+  system_ctl   ( "reload", "firewalld" );
   return 1;
 }
 
@@ -235,6 +238,7 @@ sub add_emergency_ip {
     $ip_no = get_emergency_ip();
   }
   firewall_cmd ( "--permanent --zone=public --add-rich-rule='  rule family=\"ipv4\"  source address=\"$ip_no\"   port protocol=\"tcp\" port=\"22\" accept'" );
+  system_ctl   ( "start",  "firewalld" );
   system_ctl   ( "reload", "firewalld" );
   INFO "I've added emergency IP [$ip_no] into the firewall table and reloaded the firewall.";
   return $ip_no; 
