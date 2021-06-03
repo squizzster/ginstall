@@ -73,13 +73,50 @@ sub main {
 
   if ( $server_id && !$alive_secret && $tmp_secret ) {
     INFO "We understand we are server ID [$server_id] however we're not fully configured, we'll try that now...";
+    ## This is check-in, stage 2... server has "checked in phase 1" and inital shared secret phase 1 guff is gone and cannot come back. 
+    ## Server IP number was authenticated and within 5 minutes of requesting a virtual server spin-up... so we are woof woof thunder go go.
+    ## Next we obtain the key command encryption keys of which there are quite a few...
+    authenticated_check_in( $server_id, $tmp_secret ); 
   }
 
+}
+sub authenticated_check_in {
+  my $server_id  = $_[0] or return;
+  my $tmp_secret = $_[1] or return;
+  my $cipher_secret = Crypt::CBC->new(
+                     -pass   => $tmp_secret,
+                     -cipher => 'Cipher::AES',
+                     -pbkdf  => 'pbkdf2'
+  );
+
+  my $command = ();
+  my $commands;
+  $command->{hi} = "Hello Mark!";
+  $command->{id} = $server_id;
+  my $response = get("https://api.g-booking.com/system/i/know/who?id=$server_id&payload=" . unpack( "H*", $cipher_secret->encrypt(sereal_encode_with_object($encoder, $command))));
+  if ( $response->{_ok} == 400 ) {
+    ## g-central command doesn't know who we are - so we cannot continue from here.... it's dead Jim.
+    INFO  "Error 400 - don't know more and nothing more I can do."; 
+    WARN  "I was unable to perform an ***authenticated*** security check-in.";
+    FATAL "I've reached my natural end of life... good bye world";
+    die "Argghhhhh";
+  }
+  try {
+    $commands = $decoder->decode ($cipher_secret->decrypt(pack("H*", decode_json ($response->{_content})->{message} ) ));
+  }
+  catch {
+    ERROR "EEK $@";
+    die   "Suicide is very serious... yet I must commit it... :(  Arrggggg";
+  }
+  ## OK, we have our command and control list of commands TO DO!
+  INFO Dumper $response;
+  exit;
 }
 
 
 sub first_time_check_in {
   ## This server is checking in for the first time.
+  ## This is an un-authenticated check-in which anyone can run.
   my $ip_no     = $_[0] or return;
   my $host_name = $_[1] or return;
   INFO "Attempting first time g-server check-in for [$ip_no]";
