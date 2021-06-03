@@ -106,7 +106,18 @@ sub first_time_check_in {
   # g-central says aOK, we know you... you checked in within 5 minutes of being spinned up and you're in my database...
   # We should of recevied some special command codes unique to us.... 
   # These codes are pre-codes before the real codes....
-  INFO Dumper $response;
+  my $commands;
+  
+  try {
+    my $response = decode_json ($response->{_content});
+    $commands = $decoder->decode ($cipher_who_am_i->decrypt(pack("H*", $response->{message} ) ));
+  }
+  catch {
+    FATAL "No command codes received in g-who-am-i message";
+    die "No command codes";
+  }
+  INFO Dumper $commands;
+  INFO "exit"; exit;
 }
 
 
