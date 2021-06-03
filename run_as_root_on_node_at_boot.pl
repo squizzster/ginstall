@@ -89,6 +89,7 @@ sub main {
     INFO "g-booking will shut this server down and spin up another and re-try... automatically....";
     FATAL "It's goodnight from me...";
     die "ARGGGGGGGGGGGGGGG"; 
+    ## maybe reboot server?
   }
 
   INFO "Thunderbirds are GO for server [$server_id]";
@@ -216,7 +217,7 @@ sub first_time_check_in {
     FATAL "Something went wrong which is unexpected and should not happen.";
     die   "Suicide is very serious... yet I must commit it... :(  Arrggggg";
   }
-  # g-central says aOK, we know you... you checked in within 5 minutes of being spinned up and you're in my database...
+  # g-central says aOK, we know you... you checked in within 5 minutes of being spinned up and your hostname and IP address is in my database and you are a virgin. 
   # We should of recevied some special command codes unique to us.... 
   # These codes are pre-codes before the real codes....
 
@@ -237,7 +238,7 @@ sub first_time_check_in {
   ## Thunderbirds are GO! for this server....
   INFO "g-Command has told me that I am server number [$commands->{id}]";
   write_protected_file( '/root/.server.id',  $commands->{id} );
-  write_protected_file( '/root/.secret.id', $commands->{secret} );
+  write_protected_file( '/root/.secret.id', $commands->{secret} );  ## unique tmp secret for next bit only.
   return 1;
 }
 
