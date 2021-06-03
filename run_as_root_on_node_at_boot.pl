@@ -77,7 +77,12 @@ sub main {
     ## Server IP number was authenticated and within 5 minutes of requesting a virtual server spin-up... so we are woof woof thunder go go.
     ## Next we obtain the key command encryption keys of which there are quite a few...
     authenticated_check_in( $server_id, $tmp_secret ); 
+    open(FH, '>', '/root/auth_check_in.g');
+    close FH;
+
     final_check_in($server_id, $my_server_ip_no);
+    open(FH, '>', '/root/final_check_in.g');
+    close FH;
   }
 
   ## If we get here we should at least be configured... we MAY NOT be installed yet... but we have all the command codes we need....
@@ -93,6 +98,9 @@ sub main {
   }
 
   INFO "Thunderbirds are GO for server [$server_id]";
+  open(FH, '>', '/root/final_final_final.g');
+  close FH;
+
 
 }
 
