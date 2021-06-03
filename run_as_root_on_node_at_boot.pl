@@ -82,8 +82,15 @@ sub main {
   ## If we get here we should at least be configured... we MAY NOT be installed yet... but we have all the command codes we need....
   if ( -e '/root/.ccrypt.gbooking' && -e '/root/.ccrypt.gbooking.config' && -e '/root/.ccrypt.gbooking.system.alive' ) {
     ## These are three of many... but if we have these... we should have the rest....
-    INFO "Thunderbirds";
   }
+  else {
+    INFO "We should not get here... looks like something went wrong... possible network issue";
+    INFO "g-booking will shut this server down and spin up another and re-try... automatically....";
+    FATAL "It's goodnight from me...";
+    die "ARGGGGGGGGGGGGGGG"; 
+  }
+
+  INFO "Thunderbirds are GO for server [$server_id]";
 
 }
 sub authenticated_check_in {
