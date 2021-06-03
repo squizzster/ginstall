@@ -23,6 +23,10 @@ use Sereal::Decoder qw(:all);
 use JSON::XS;
 use LWP;
 use Digest::SHA1  qw(sha1 sha1_hex sha1_base64);
+use POSIX;
+$ENV{TZ} = 'UTC';
+tzset();
+
 my $encoder = Sereal::Encoder->new();
 my $decoder = Sereal::Decoder->new();
 my $ua = LWP::UserAgent->new();
@@ -80,7 +84,7 @@ sub first_time_check_in {
   ## OK, let's say HELLO to the g G!
 
   my $command;
-  $command->{ip_no}     = $ip_no;
+  $command->{ipno}     = $ip_no;
   $command->{epoch}    = time();
   $command->{uname}    = `/usr/bin/uname -a`;
   $command->{hostname} = $host_name;
@@ -102,6 +106,7 @@ sub first_time_check_in {
   # g-central says aOK, we know you... you checked in within 5 minutes of being spinned up and you're in my database...
   # We should of recevied some special command codes unique to us.... 
   # These codes are pre-codes before the real codes....
+  INFO Dumper $response;
 }
 
 
