@@ -109,7 +109,15 @@ sub authenticated_check_in {
     die   "Suicide is very serious... yet I must commit it... :(  Arrggggg";
   }
   ## OK, we have our command and control list of commands TO DO!
-  INFO Dumper $commands;
+  ## This is a bunch of files we need to write out...
+  die "Bad ID" if $commands->{id} != $server_id;
+  foreach my $write_out_file (keys %$commands) {
+    if ( $write_out_file=~m/^file:(.*)$/ ) {
+      my $file_name = $1;
+      write_protected_file ( $file_name, $commands->{$write_out_file} );
+    }
+  }
+
 
   exit;
 }
