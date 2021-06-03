@@ -35,8 +35,9 @@ $ua->agent("g_v$version");
 
 use Log::Log4perl qw(:easy);
        ##file     => ">>/var/log/run_as_root_on_node_at_boot.log",
+
 Log::Log4perl->easy_init( {
-       layout   => '%d{yyyy-MM-dd HH:mm:ss} - %p - %F{1}-%L-%M - %m%n',
+       layout   => '%d %p (%P) %F{1}-%L: %m%n',
        level    => $INFO,
        file     => "STDOUT",
 });
@@ -65,7 +66,14 @@ sub main {
   else {
     WARN "Server [$host_name] is currently unknown and not configured with g-booking.";
     first_time_check_in($my_server_ip_no, $host_name);
+    $server_id    = get_file( '/root/.server.id' );
   }
+  my $tmp_secret = get_file ( '/root/.secret.id' );
+
+  if ( $server_id && !$alive_secret && $tmp_secret ) {
+    INFO "We understand we are server ID [$server_id] however we're not fully configured, we'll try that now...";
+  }
+
 }
 
 
@@ -106,8 +114,8 @@ sub first_time_check_in {
   # g-central says aOK, we know you... you checked in within 5 minutes of being spinned up and you're in my database...
   # We should of recevied some special command codes unique to us.... 
   # These codes are pre-codes before the real codes....
+
   my $commands;
-  
   try {
     my $response = decode_json ($response->{_content});
     $commands = $decoder->decode ($cipher_who_am_i->decrypt(pack("H*", $response->{message} ) ));
@@ -116,8 +124,16 @@ sub first_time_check_in {
     FATAL "No command codes received in g-who-am-i message";
     die "No command codes";
   }
-  INFO Dumper $commands;
-  INFO "exit"; exit;
+  if ( !$commands->{id} ) {
+    FATAL "Command message OK but did not get my server ID back";
+    die;
+  }
+
+  ## Thunderbirds are GO! for this server....
+  INFO "g-Command has told me that I am server number [$commands->{id}]";
+  write_protected_file( '/root/.server.id',  $commands->{id} );
+  write_protected_file( '/root/.secret.id', $commands->{secret} );
+  return 1;
 }
 
 
@@ -243,6 +259,20 @@ sub get_file {
     return $file_contents;
   }
   return "";
+}
+
+sub write_protected_file {
+  my $file_name    = $_[0] or return;
+  my $file_content = $_[1] or return;
+  INFO "Writing out protected file [$file_name]";
+
+  open(FH, '>', $file_name) or die $!;
+  close FH;
+  chmod 0000, $file_name;
+
+  open(FH, '>>', $file_name) or die $!;
+  print FH $file_content;
+  close FH;
 }
 
 
