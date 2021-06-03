@@ -79,6 +79,12 @@ sub main {
     authenticated_check_in( $server_id, $tmp_secret ); 
   }
 
+  ## If we get here we should at least be configured... we MAY NOT be installed yet... but we have all the command codes we need....
+  if ( -e '/root/.ccrypt.gbooking' && -e '/root/.ccrypt.gbooking.config' && -e '/root/.ccrypt.gbooking.system.alive' ) {
+    ## These are three of many... but if we have these... we should have the rest....
+    INFO "Thunderbirds";
+  }
+
 }
 sub authenticated_check_in {
   my $server_id  = $_[0] or return;
@@ -124,8 +130,7 @@ sub authenticated_check_in {
   ## OK, we've wrote out all the secret command files for server installation
   ## Encrpytion keys will follow in the next phase...
   ## So right now we have a bare arse server but she/he/binary (get it?) BAH!  understands a few things about life... 
-
-  exit;
+  return 1;
 }
 
 
