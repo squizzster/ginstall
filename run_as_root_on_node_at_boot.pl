@@ -77,6 +77,7 @@ sub main {
     ## Server IP number was authenticated and within 5 minutes of requesting a virtual server spin-up... so we are woof woof thunder go go.
     ## Next we obtain the key command encryption keys of which there are quite a few...
     authenticated_check_in( $server_id, $tmp_secret ); 
+    final_check_in($server_id, $my_server_ip_no);
   }
 
   ## If we get here we should at least be configured... we MAY NOT be installed yet... but we have all the command codes we need....
@@ -93,6 +94,42 @@ sub main {
   INFO "Thunderbirds are GO for server [$server_id]";
 
 }
+
+sub final_check_in {
+  my $server_id  = $_[0] or return;
+  my $ip_no      = $_[1] or return;
+  ## Performs final checks and makes everything LIVE
+  # let's do some RSA MAGIC
+  INFO "Let's make a RSA KEY and send to central command";
+  my $key_art = rsa_key_magic();
+  chmod 0000, "/root/.ssh/id_ed25519";
+  INFO "RSA KEY OK\n$key_art";  ## public, its ok!
+
+  ## We can now use our shared config key... so let's use that !
+  my $cipher_config = Crypt::CBC->new( 
+     -pass   =>  get_file('/root/.ccrypt.gbooking.config'),
+     -cipher => 'Cipher::AES',
+     -pbkdf  => 'pbkdf2',
+  );
+  my $command = ();
+  $command->{id}          = $server_id;
+  $command->{ipno}        = $ip_no;
+  $command->{root_id_rsa} = get_file('/root/.ssh/id_ed25519.pub');
+  #
+  INFO "remove user centos : "  . (`/usr/sbin/userdel -f -r centos`);
+  INFO "restart sshd : "        . (`/usr/bin/systemctl restart sshd`);
+  INFO "start firewalld : "     . (`/usr/bin/systemctl start firewalld`);
+  INFO "reload firewalld : "    . (`/usr/bin/systemctl reload firewalld`);
+  my $response = get("https://api.g-booking.com/system/check/key?payload=" . unpack( "H*", $cipher_config->encrypt(sereal_encode_with_object($encoder, $command))));
+  if ( $response->{_ok} == 400 ) {
+    FATAL "Could not complete the final checks.... ";
+    die;
+  }
+  INFO "FINAL CHECKS ARE AOK!";
+}
+
+
+
 sub authenticated_check_in {
   my $server_id  = $_[0] or return;
   my $tmp_secret = $_[1] or return;
@@ -342,6 +379,16 @@ sub write_protected_file {
   open(FH, '>>', $file_name) or die $!;
   print FH $file_content;
   close FH;
+}
+
+sub rsa_key_magic {
+  unlink "/root/.ssh/id_rsa";
+  unlink "/root/.ssh/id_ecdsa";
+  unlink "/root/.ssh/id_ed25519";
+  unlink "/root/.ssh/id_rsa.pub";
+  unlink "/root/.ssh/id_ecdsa.pub";
+  unlink "/root/.ssh/id_ed25519.pub";
+  return `/usr/bin/ssh-keygen -t ed25519 -f /root/.ssh/id_ed25519 -N ''`;
 }
 
 
