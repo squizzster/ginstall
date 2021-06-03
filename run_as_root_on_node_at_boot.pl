@@ -258,7 +258,7 @@ sub get {
   my $ret = http_get($url);
   while ( $ret->{_ok} != 200 && $ret->{_ok} != 400 ) {
     sleep 1;
-    WARN "HTTP failed. ($url). ($ret->{_msg})";
+    WARN "HTTP failed. [$ret->{_ok}]  ($ret->{_msg})";
     $ret = http_get($url);
   }
   return $ret;
