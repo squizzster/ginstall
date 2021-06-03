@@ -32,15 +32,15 @@ my $decoder = Sereal::Decoder->new();
 my $ua = LWP::UserAgent->new();
 $ua->agent("g_v$version"); 
 
-
 use Log::Log4perl qw(:easy);
-       ##file     => ">>/var/log/run_as_root_on_node_at_boot.log",
+    ##file     => ">>/var/log/run_as_root_on_node_at_boot.log",
 
 Log::Log4perl->easy_init( {
-       layout   => '%d %p (%P) %F{1}-%L: %m%n',
+       layout   => '%d{yyyy-MM-dd HH:mm:ss} - %p - %F{1}-%L-%M - %m%n',
        level    => $INFO,
        file     => "STDOUT",
-});
+} ); 
+
 
 main ();
 exit;
