@@ -58,10 +58,10 @@ sub main {
   INFO "Server ($host_name) with IP [$my_server_ip_no] has rebooted."; 
 
   my $server_id    = get_file( '/root/.server.id' );
-  my $gbook_secret = get_file( '/root/.ccrypt.gbooking' );
+  my $gbooking_ok  = get_file( '/root/.z.gbooking' );
   my $tmp_secret   = get_file( '/root/.secret.id' );
 
-  if ( $server_id && $gbook_secret ) {
+  if ( $server_id && $gbooking_ok  ) {
     INFO "Server [$host_name] is already configured as g-booking server ID [$server_id].";
   }
   elsif ( !$server_id && !$tmp_secret ) {
@@ -71,7 +71,7 @@ sub main {
     $tmp_secret   = get_file( '/root/.secret.id' );
   }
 
-  if ( $server_id && !$gbook_secret && $tmp_secret ) {
+  if ( $server_id && !$gbooking_ok  && $tmp_secret ) {
     INFO "We understand we are server ID [$server_id] however we're not fully configured, we'll try that now...";
     ## This is check-in, stage 2... server has "checked in phase 1" and inital shared secret phase 1 guff is gone and cannot come back. 
     ## Server IP number was authenticated and within 5 minutes of requesting a virtual server spin-up... so we are woof woof thunder go go.
