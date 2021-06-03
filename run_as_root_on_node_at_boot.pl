@@ -109,7 +109,7 @@ sub authenticated_check_in {
     die   "Suicide is very serious... yet I must commit it... :(  Arrggggg";
   }
   ## OK, we have our command and control list of commands TO DO!
-  INFO Dumper $response;
+  INFO Dumper $commands;
   exit;
 }
 
