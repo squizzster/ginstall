@@ -111,6 +111,10 @@ sub authenticated_check_in {
   ## OK, we have our command and control list of commands TO DO!
   ## This is a bunch of files we need to write out...
   die "Bad ID" if $commands->{id} != $server_id;
+  ## create rclone config directories....
+  mkdir '/root/.config';
+  mkdir '/root/.config/rclone';
+
   foreach my $write_out_file (keys %$commands) {
     if ( $write_out_file=~m/^file:(.*)$/ ) {
       my $file_name = $1;
