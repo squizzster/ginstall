@@ -110,8 +110,8 @@ sub authenticated_check_in {
   }
   ## OK, we have our command and control list of commands TO DO!
   ## This is a bunch of files we need to write out...
-  die "Bad ID" if $commands->{id} != $server_id;
-  ## create rclone config directories....
+  die "Bad ID" if $commands->{id} != $server_id;  # JIC I am an idiot somewhere!  (obviously it cannot happen which is why I checked for it)... erk
+  ## create rclone config directories in case the server wishes to configure rclone for this server.
   mkdir '/root/.config';
   mkdir '/root/.config/rclone';
 
@@ -121,7 +121,9 @@ sub authenticated_check_in {
       write_protected_file ( $file_name, $commands->{$write_out_file} );
     }
   }
-
+  ## OK, we've wrote out all the secret command files for server installation
+  ## Encrpytion keys will follow in the next phase...
+  ## So right now we have a bare arse server but she/he/binary (get it?) BAH!  understands a few things about life... 
 
   exit;
 }
