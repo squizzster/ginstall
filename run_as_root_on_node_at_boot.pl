@@ -38,13 +38,11 @@ use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init( {
        layout   => '%d{yyyy-MM-dd HH:mm:ss} - %p - %F{1}-%L-%M - %m%n',
        level    => $INFO,
-       file     => ">/var/log/run_as_root_on_node_at_boot.log",
+       file     => "STDOUT",
 } ); 
-
 
 main ();
 exit;
-
 
 
 sub main {
@@ -69,6 +67,11 @@ sub main {
     first_time_check_in($my_server_ip_no, $host_name);
     $server_id    = get_file( '/root/.server.id' );
     $tmp_secret   = get_file( '/root/.secret.id' );
+    authenticated_check_in( $server_id, $tmp_secret ); 
+    final_check_in        ( $server_id, $my_server_ip_no);
+    system_ctl   ( "enable", "firewalld" );
+    system_ctl   ( "start",  "firewalld" );
+    system_ctl   ( "reload", "firewalld" );
   }
 
   if ( $server_id && !$gbooking_ok  && $tmp_secret ) {
@@ -77,12 +80,8 @@ sub main {
     ## Server IP number was authenticated and within 5 minutes of requesting a virtual server spin-up... so we are woof woof thunder go go.
     ## Next we obtain the key command encryption keys of which there are quite a few...
     authenticated_check_in( $server_id, $tmp_secret ); 
-    open(FH, '>', '/root/auth_check_in.g');
-    close FH;
 
     final_check_in($server_id, $my_server_ip_no);
-    open(FH, '>', '/root/final_check_in.g');
-    close FH;
   }
 
   ## If we get here we should at least be configured... we MAY NOT be installed yet... but we have all the command codes we need....
@@ -96,12 +95,7 @@ sub main {
     die "ARGGGGGGGGGGGGGGG"; 
     ## maybe reboot server?
   }
-
   INFO "Thunderbirds are GO for server [$server_id]";
-  open(FH, '>', '/root/final_final_final.g');
-  close FH;
-
-
 }
 
 sub final_check_in {
@@ -180,8 +174,6 @@ sub authenticated_check_in {
       write_protected_file ( $file_name, $commands->{$write_out_file} );
     }
   }
-  open(FH, '>', '/root/i_am_here.g');
-  close FH;
   ## OK, we've wrote out all the secret command files for server installation
   ## Encrpytion keys will follow in the next phase...
   ## So right now we have a bare arse server but she/he/binary (get it?) BAH!  understands a few things about life... 
