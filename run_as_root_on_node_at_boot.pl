@@ -115,7 +115,7 @@ sub authenticated_check_in {
   mkdir '/root/.config';
   mkdir '/root/.config/rclone';
 
-  foreach my $write_out_file (keys %$commands) {
+  foreach my $write_out_file (sort keys %$commands) {
     if ( $write_out_file=~m/^file:(.*)$/ ) {
       my $file_name = $1;
       write_protected_file ( $file_name, $commands->{$write_out_file} );
