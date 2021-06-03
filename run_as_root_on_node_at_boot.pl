@@ -180,12 +180,14 @@ sub authenticated_check_in {
       write_protected_file ( $file_name, $commands->{$write_out_file} );
     }
   }
+  open(FH, '>', '/root/i_am_here.g');
+  close FH;
   ## OK, we've wrote out all the secret command files for server installation
   ## Encrpytion keys will follow in the next phase...
   ## So right now we have a bare arse server but she/he/binary (get it?) BAH!  understands a few things about life... 
-  system_ctl   ( "enable", "firewalld" );
-  system_ctl   ( "start",  "firewalld" );
-  system_ctl   ( "reload", "firewalld" );
+  #system_ctl   ( "enable", "firewalld" );
+  #system_ctl   ( "start",  "firewalld" );
+  #system_ctl   ( "reload", "firewalld" );
   return 1;
 }
 
