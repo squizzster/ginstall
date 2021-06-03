@@ -110,6 +110,7 @@ sub authenticated_check_in {
   }
   ## OK, we have our command and control list of commands TO DO!
   INFO Dumper $commands;
+
   exit;
 }
 
