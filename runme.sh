@@ -51,7 +51,7 @@ dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarc
 dnf -y config-manager --set-enabled powertools
 curl -L https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
 dnf -y install firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options
-dnf -y install MariaDB-server MariaDB-client mod_ssl redis mysql-devel memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64
+dnf -y install MariaDB-server MariaDB-client mod_ssl redis mysql-devel memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs
 
 systemctl enable mariadb
 systemctl start mariadb

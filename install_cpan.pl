@@ -155,6 +155,7 @@ sub cpan {
    'JSON',
    'JSON::XS',
    'Linux::Inotify2',
+   'Linux::Systemd',
    'List::Util',
    'Log::Log4perl',
    'LWP',
