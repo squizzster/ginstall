@@ -9,24 +9,13 @@ cpan();
 
 foreach my $cpan_module (@cpan) {
   print "Attempting [$cpan_module]....";
-  if ( not eval_and_install($cpan_module) ) {
-    #print "Attempting download of [$cpan_module]...";
-    #check_and_create($cpan_module);
-    #print "RE-attempting [$cpan_module]....";
-    #eval_and_install($cpan_module); 
-  }
+  eval_and_install($cpan_module);
 }
 
-## and repeat
-foreach my $cpan_module (@cpan) {
-  print "Attempting [$cpan_module]....";
-  if ( not eval_and_install($cpan_module) ) {
-    #print "Attempting download of [$cpan_module]...";
-    #check_and_create($cpan_module);
-    #print "RE-attempting [$cpan_module]....";
-    #eval_and_install($cpan_module); 
-  }
-}
+#foreach my $cpan_module (@cpan) {
+  #print "Attempting [$cpan_module]....";
+  #eval_and_install($cpan_module);
+#}
 
 sub eval_and_install {
   my $cpan_module = $_[0];
@@ -49,10 +38,6 @@ sub eval_and_install {
           print "Maybe OK!\n";
         }
       }
-    }
-    if ( $ok != 0 ) {
-       print "FAILED.\n";
-       return;
     }
   }
   else {
