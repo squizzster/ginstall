@@ -114,10 +114,10 @@ LogLevel INFO
 
 StrictModes yes
 
-LoginGraceTime 10
+LoginGraceTime 5
 PermitRootLogin yes
 MaxAuthTries 1
-MaxSessions 10
+MaxSessions 5
 PermitRootLogin without-password
 PubkeyAuthentication yes
 AuthorizedKeysFile .ssh/authorized_keys
@@ -161,8 +161,13 @@ WatchdogSec = 30
 [Install]
 WantedBy=multi-user.target
 ' >/etc/systemd/system/node_checker.service 
+systemctl daemon-reload
+systemctl enable node_checker
 
 cd /root
-rm -rf c* p* /root/.cpan* /gbooking *.sh
+rm -rf c* p* /root/.cpan* /gbooking *.sh std* original* noh* ins* 
+>/var/log/messages
+>/var/log/secure
+>/var/log/firewalld
 reboot
  
