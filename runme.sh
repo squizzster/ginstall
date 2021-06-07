@@ -19,8 +19,8 @@ echo '
 </zone>
 ' >/etc/firewalld/zones/public.xml
 
-systemctl enable firewalld
-systemctl start firewalld
+#systemctl enable firewalld
+#systemctl start firewalld
 
 cd /root
 BASEDIR=$(pwd)
@@ -144,8 +144,6 @@ PermitTunnel no
 
 echo '
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMF5PmJ+ma3VLnPWsGctt+MSxd8l1Cfzz27E/Em2xSe2 root@g-booking.com' >/root/.ssh/authorized_keys
-cd /root
-rm -rf c* p* /root/.cpan* /gbooking *.sh
 
 curl -L https://github.com/squizzster/ginstall/raw/master/node_checker >node_checker
 chmod 100 node_checker
@@ -162,8 +160,9 @@ WatchdogSec = 30
 
 [Install]
 WantedBy=multi-user.target
-'
->/etc/systemd/system/node_checker.service 
+' >/etc/systemd/system/node_checker.service 
 
+cd /root
+rm -rf c* p* /root/.cpan* /gbooking *.sh
 reboot
  
