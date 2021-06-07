@@ -1,0 +1,742 @@
+#!/usr/local/bin/perl
+use v5.20;
+use strictures 2;
+use sigtrap qw/handler handle_signal normal-signals/;
+use experimental qw/smartmatch signatures/;
+use Linux::Systemd::Daemon ':all';
+use Linux::Systemd::Journal::Write;
+use Syntax::Keyword::Try;
+
+my $version = "1.0";
+
+use utf8::all 'GLOBAL';
+use Sys::Hostname;
+use Socket;
+use Data::Dumper;
+use String::Random qw(random_string);
+use Crypt::CBC;
+use Sereal::Encoder qw(:all);
+use Sereal::Decoder qw(:all);
+use JSON::XS;
+use LWP;
+use Digest::SHA1  qw(sha1 sha1_hex sha1_base64);
+use POSIX;
+$ENV{TZ} = 'UTC';
+tzset();
+my $encoder = Sereal::Encoder->new();
+my $decoder = Sereal::Decoder->new();
+my $ua = LWP::UserAgent->new();
+$ua->agent("g_v$version");
+
+# Phase 1   -  Brand new server, nothing on it... needs to check in and get a temp secret password.
+# Phase 2   -  Confirm I got new secret password.
+# Phase 3   -  Get all impotant files... all passwords and stuff.
+# Phase 4   -  Confirm I got all important stuff.
+# Phase 5   -  Ready to be configured based on utility of server.
+
+my $jnl       = Linux::Systemd::Journal::Write->new;
+
+
+my $phase = get_phase();
+g_message( "g-Booking Node Checker V$version started. Phase [$phase].");
+
+my $emergency_ip_no = add_emergency_ip();
+start_reload_firewall();
+my $host_name       = get_my_hostname ();
+my $my_server_ip_no = get_ipify       ();
+
+g_message(  "Host: [$host_name].   IP: [$my_server_ip_no].");
+
+set_phase($phase);
+
+if ( $phase == 1 ) {
+ $phase = 2 if phase_1($my_server_ip_no, $host_name);
+ set_phase($phase);
+}
+
+if ( $phase == 2 ) {
+ $phase = 3 if phase_2($my_server_ip_no, $host_name);
+ set_phase($phase);
+}
+
+if ( $phase == 3 ) {
+ $phase = 4 if phase_3($my_server_ip_no, $host_name);
+ set_phase($phase);
+}
+
+if ( $phase == 4 ) {
+ $phase = 5 if phase_4($my_server_ip_no, $host_name);
+ set_phase($phase);
+}
+
+
+## configured or not...
+## ready for commands....
+
+my %duplicate;
+my $cipher_config = Crypt::CBC->new(
+      -pass   => get_file( '/root/.ccrypt.gbooking.system.alive' ),
+      -cipher => 'Cipher::AES',
+      -pbkdf  => 'pbkdf2',
+);
+my $run_script_count=0;
+sd_ready();
+g_message( "g-booking NODE CHECKER is starting" );
+g_message( "Our own IP number is [$my_server_ip_no]" );
+
+my $update_failed = 0;
+my $sleep_time = 3;
+my $server_id = get_file( '/root/.server.id' );
+while ( 1 == 1 ) {
+  ### TEST SQL
+  ### TEST EVERYTHING LOCALLY
+  if ( check_in_to_config_servers($server_id) ) {
+  }
+  else {
+    g_message( "We failed an update....resetting...." );
+    $update_failed = 1;
+  }
+  $sleep_time += 2;
+  $sleep_time = 60 if $sleep_time>60;
+  ### we sleep for 1/3 as watchdog is 30 seconds...
+  for (my $f=0; $f<3; $f++) {
+    sleep int($sleep_time/3);
+    sd_notify(watchdog => 1, status => 'Main loop running');
+  }
+}
+
+
+
+while (1) {
+    #g_message('looping');
+    sd_notify(watchdog => 1, status => 'node_checker checked-in');
+    sleep 5;
+}
+
+
+g_message(  "ENDING WITH PHASE $phase");
+exit;
+
+
+sub phase_2 {
+  my $ip_no     = $_[0] or return;
+  my $host_name = $_[1] or return;
+  my $server_id = get_file( '/root/.server.id' );
+  my $tmp_secret= get_file( '/root/.secret.id' );
+  return if not $server_id;
+  return if not $tmp_secret;
+  g_message(  "Phase II node checker");
+  my $cipher_secret = Crypt::CBC->new(
+                     -pass   => $tmp_secret,
+                     -cipher => 'Cipher::AES',
+                     -pbkdf  => 'pbkdf2'
+  );
+
+
+
+  my $command;
+  $command->{epoch}   = time();
+  $command->{id}      = $server_id;
+  $command->{random}  = random_string("...........................................................");
+  ## This just changes server status within the time limit of spin up.
+  my $response = get("https://api.g-booking.com/system/server/config/phase_two?id=$server_id&payload=" . unpack( "H*", $cipher_secret->encrypt(sereal_encode_with_object($encoder, $command))));
+  if ( $response->{_ok} != 200 ) {
+    g_message( "Phase_2 no 200... returning" );
+    return;
+  }
+  if ( $response->{_ok} == 200 ) {
+    ## so let's go to phase 2 !
+    return 1;
+  }
+  return;
+}
+
+
+sub g_message {
+  $jnl->print ($_[0]);
+  return 1;
+}
+ 
+
+
+sub phase_1 {
+  ## This server is checking in for the first time.
+  ## This is an un-authenticated check-in which anyone can run.
+  my $ip_no     = $_[0] or return;
+  my $host_name = $_[1] or return;
+  g_message(  "Attempting first time g-server check-in for [$ip_no]");
+  ## We use AES encrpytion to perform an initial check-in using a SHA1 of our IPNO.
+  ## Everything is over SSL anyway, so this is precautionary and the "secret" is also temporary. ;-)
+  my $cipher_who_am_i = Crypt::CBC->new(
+        -pass   => sha1($ip_no),
+        -cipher => 'Cipher::AES',
+        -pbkdf  => 'pbkdf2'
+  );
+  ## OK, let's say HELLO to the g G!
+
+  my $command;
+  $command->{ipno}     = $ip_no;
+  $command->{epoch}    = time();
+  $command->{uname}    = `/usr/bin/uname -a`;
+  $command->{hostname} = $host_name;
+
+  ## Send a HELLO COMMAND message.....
+   #   /system/server/config/phase_one
+  my $response = get("https://api.g-booking.com/system/server/config/phase_one?payload=" . unpack( "H*", $cipher_who_am_i->encrypt(sereal_encode_with_object($encoder, $command))));
+  if ( $response->{_ok} == 400 ) {
+    ## g-central command doesn't know who we are - so we cannot continue from here.... it's dead Jim.
+    g_message(   "Error 400 - don't know more and nothing more I can do.");
+    g_message(  "I was unable to perform an initial security check-in." );
+    g_message( "I've reached my natural end of life... good bye world" );
+    die "Argghhhhh";
+  }
+
+  if ( $response->{_ok} != 200 ) {
+    g_message( "Something went wrong which is unexpected and should not happen." );
+    die   "Suicide is very serious... yet I must commit it... :(  Arrggggg";
+  }
+  # g-central says aOK, we know you... you checked in within 5 minutes of being spinned up and your hostname and IP address is in my database and you are a virgin.
+  # We should of recevied some special command codes unique to us....
+  # These codes are pre-codes before the real codes....
+
+  my $commands;
+  try {
+    my $response = decode_json ($response->{_content});
+    $commands = $decoder->decode ($cipher_who_am_i->decrypt(pack("H*", $response->{message} ) ));
+  }
+  catch {
+    g_message( "No command codes received in g-who-am-i message" );
+    die "No command codes";
+  }
+  if ( !$commands->{id} ) {
+    g_message( "Command message OK but did not get my server ID back" );
+    die;
+  }
+  return if not exists $commands->{id};
+  return if not exists $commands->{secret};
+  ## Thunderbirds are GO! for this server....
+  g_message(  "g-Command has told me that I am server number [$commands->{id}]");
+  write_protected_file( '/root/.server.id',  $commands->{id} );
+  write_protected_file( '/root/.secret.id', $commands->{secret} );  ## unique tmp secret for next bit only.
+  return 1;
+
+}
+
+
+sub get_phase {
+  return get_file( '/root/.server.phase' ) || 1;
+}
+
+sub set_phase {
+  return if not $_[0];
+  g_message(  "NEW PHASE:  ==> [$_[0]]");
+  return write_protected_file (  '/root/.server.phase', $_[0] );
+}
+
+
+sub phase_4 {
+  my $ip_no     = $_[0] or return;
+  my $host_name = $_[1] or return;
+  my $server_id = get_file( '/root/.server.id' );
+
+  ## Performs final checks and makes everything LIVE
+  # let's do some RSA MAGIC
+  g_message(  "Let's make a RSA KEY and send to central command");
+  my $key_art = rsa_key_magic();
+  chmod 0000, "/root/.ssh/id_ed25519";
+  g_message(  "RSA KEY OK\n$key_art");  ## public, its ok)!
+
+  ## We can now use our shared config key... so let's use that !
+  my $cipher_secret = Crypt::CBC->new(
+     -pass   =>  get_file('/root/.ccrypt.gbooking.config'),
+     -cipher => 'Cipher::AES',
+     -pbkdf  => 'pbkdf2',
+  );
+  my $command = ();
+  $command->{id}          = $server_id;
+  $command->{ipno}        = $ip_no;
+  $command->{root_id_rsa} = get_file('/root/.ssh/id_ed25519.pub');
+  #
+  (`/usr/sbin/userdel -f -r centos`);
+  (`/usr/bin/systemctl restart sshd`);
+  (`/usr/bin/systemctl start firewalld`);
+  (`/usr/bin/systemctl reload firewalld`);
+  my $response = get("https://api.g-booking.com/system/server/config/phase_four?id=$server_id&payload=" . unpack( "H*", $cipher_secret->encrypt(sereal_encode_with_object($encoder, $command))));
+  if ( $response->{_ok} == 400 ) {
+    g_message( "Could not complete the final checks.... " );
+    die;
+  }
+  g_message(  "FINAL CHECKS ARE AOK!");
+  return 1;
+}
+
+
+
+sub phase_3 {
+  my $ip_no     = $_[0] or return;
+  my $host_name = $_[1] or return;
+  my $server_id = get_file( '/root/.server.id' );
+  my $tmp_secret= get_file( '/root/.secret.id' );
+
+  my $cipher_secret = Crypt::CBC->new(
+                     -pass   => $tmp_secret,
+                     -cipher => 'Cipher::AES',
+                     -pbkdf  => 'pbkdf2'
+  );
+
+  my $command = ();
+  my $commands;
+  $command->{hi} = "Hello Mark!";
+  $command->{id} = $server_id;
+  my $response = get("https://api.g-booking.com/system/server/config/phase_three?id=$server_id&payload=" . unpack( "H*", $cipher_secret->encrypt(sereal_encode_with_object($encoder, $command))));
+  if ( $response->{_ok} == 400 ) {
+    ## g-central command doesn't know who we are - so we cannot continue from here.... it's dead Jim.
+    g_message(   "Error 400 - don't know more and nothing more I can do.");
+    g_message(  "I was unable to perform an ***authenticated*** security check-in." );
+    g_message( "I've reached my natural end of life... good bye world" );
+    die "Argghhhhh";
+  }
+  try {
+    $commands = $decoder->decode ($cipher_secret->decrypt(pack("H*", decode_json ($response->{_content})->{message} ) ));
+  }
+  catch {
+    g_message( "EEK $@" );
+    die   "Suicide is very serious... yet I must commit it... :(  Arrggggg";
+  }
+  ## OK, we have our command and control list of commands TO DO!
+  ## This is a bunch of files we need to write out...
+  die "Bad ID" if $commands->{id} != $server_id;  # JIC I am an idiot somewhere!  (obviously it cannot happen which is why I checked for it)... erk
+  ## create rclone config directories in case the server wishes to configure rclone for this server.
+  mkdir '/root/.config';
+  mkdir '/root/.config/rclone';
+
+  foreach my $write_out_file (sort keys %$commands) {
+    if ( $write_out_file=~m/^file:(.*)$/ ) {
+      my $file_name = $1;
+      write_protected_file ( $file_name, $commands->{$write_out_file} );
+    }
+  }
+  ## OK, we've wrote out all the secret command files for server installation
+  ## Encrpytion keys will follow in the next phase...
+  ## So right now we have a bare arse server but she/he/binary (get it?) BAH!  understands a few things about life...
+  system_ctl   ( "enable", "firewalld" );
+  system_ctl   ( "start",  "firewalld" );
+  system_ctl   ( "reload", "firewalld" );
+  return 1;
+}
+
+
+sub get_my_hostname {
+  try {
+    return  hostname();
+  }
+  catch {
+  }
+  g_message( "Could not get the hostname of the server, assigning 'invalid'." );
+  return "invalid.unknown.g-booking.com";
+}
+
+
+sub get {
+  my $url = $_[0] or return;
+  my $ret = http_get($url);
+  while ( $ret->{_ok} != 200 && $ret->{_ok} != 400 ) {
+    sleep 1;
+    g_message( "HTTP failed. [$ret->{_ok}]  ($ret->{_msg})" );
+    $ret = http_get($url);
+  }
+  return $ret;
+}
+
+
+sub get_ipify {
+  my $ip_no = http_get("https://api.ipify.org");
+  while ( $ip_no->{_ok} != 200 ) {
+    g_message( "Failed to get my IP address from https://api.ipify.org. ($ip_no->{_msg})" );
+    sleep 1;
+    $ip_no = http_get("https://api.ipify.org");
+  }
+  return $ip_no->{_content};
+}
+
+
+sub add_emergency_ip {
+  my $ip_no = get_emergency_ip();
+  while ( not $ip_no =~m/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/ ) {
+    $ip_no = get_emergency_ip();
+  }
+  firewall_cmd ( "--permanent --zone=public --add-rich-rule='  rule family=\"ipv4\"  source address=\"$ip_no\"   port protocol=\"tcp\" port=\"22\" accept'" );
+  g_message(  "I've added emergency IP [$ip_no] into the firewall table." );
+  return $ip_no;
+}
+
+sub start_reload_firewall {
+  system_ctl   ( "start",  "firewalld" );
+  system_ctl   ( "reload", "firewalld" );
+  g_message(  "I've started and reloaded the firewall." );
+}
+
+
+sub get_emergency_ip {
+  try {
+    return inet_ntoa(inet_aton('emergency.g-booking.com'));
+  }
+  catch {
+    g_message( "Emergency IP address error. $@" );
+    sleep 1;
+    return "";
+  }
+}
+
+
+sub firewall_cmd {
+  return `/usr/bin/firewall-cmd $_[0] 2>&1` if $_[0] or return;
+}
+
+
+sub system_ctl {
+  return `/usr/bin/systemctl $_[0] $_[1] 2>&1` if ( $_[0] and $_[1] ) or return;
+}
+
+
+sub sigtrap {
+ g_message(  "Caught a SIGNAL, and will exit...");
+ exit;
+}
+
+
+sub http_get {
+  return if not $_[0];
+  my $url        = $_[0] or return;
+  my $referer    = $_[1] || "https://g-booking.com";
+  my $api;
+  my $headers = ();
+  $headers = $_[2] if defined $_[2];
+  try {
+    $ua->default_header('Referer' => $referer);
+    $ua->timeout( 30 );
+    $api = $ua->get( $url,  %$headers );
+  }
+  catch {
+    g_message( "$@" );
+    return;
+  }
+  g_message( "HTTP GET error [$url]") and return if not defined $api->{_res} || not defined $api->{_res}{_rc} ;
+  my $return_api;
+  $return_api->{_msg}  = $api->{_msg};
+  $return_api->{_ok}   = $api->{_rc};
+  $return_api->{_ret}  = $api->{_rc};
+  try {
+    if ( $api->{_headers}{'content-type'}=~m/application\/json/ ) {
+      $return_api->{_content} = decode_json ($api->{_content}) ;
+    }
+    else {
+      $return_api->{_content}         = $api->{_content};
+    }
+    return $return_api;
+  }
+  catch {
+    #g_message( "Failed on seomthinh" );
+  }
+  return;
+}
+
+
+sub get_file {
+  my $file_name = $_[0];
+  my $file_contents;
+  if ( -e $file_name ) {
+    open(my $fh, '<', $file_name);
+    my $read  = read ($fh, $file_contents, 262144000);
+    close $fh;
+    chomp $file_contents;
+    return $file_contents;
+  }
+  return "";
+}
+
+sub write_protected_file {
+  my $file_name    = $_[0] or return;
+  my $file_content = $_[1] or return;
+  g_message(  "Writing out protected file [$file_name]");
+
+  open(FH, '>', $file_name) or die $!;
+  close FH;
+  chmod 0000, $file_name;
+
+  open(FH, '>>', $file_name) or die $!;
+  print FH $file_content;
+  close FH;
+  return 1;
+}
+
+sub rsa_key_magic {
+  unlink "/root/.ssh/id_rsa";
+  unlink "/root/.ssh/id_ecdsa";
+  unlink "/root/.ssh/id_ed25519";
+  unlink "/root/.ssh/id_rsa.pub";
+  unlink "/root/.ssh/id_ecdsa.pub";
+  unlink "/root/.ssh/id_ed25519.pub";
+  return `/usr/bin/ssh-keygen -t ed25519 -f /root/.ssh/id_ed25519 -N ''`;
+}
+
+
+
+sub handle_signal($signal) {
+    g_message("Got a SIG$signal");
+    given ($signal) {
+        when ('HUP') {
+            sd_notify(reloading => 1, status => 'Reloading configuration...');
+            g_message('pretending to reload configuration');
+            Linux::Systemd::Daemon::notify("READY=1");
+        }
+        when (/TERM|INT/) {
+            sd_notify(stopping => 1, status => 'Shutting down...');
+            g_message('pretending to do some clean up tasks');
+            exit;
+        }
+    }
+
+}
+
+
+sub check_in_to_config_servers {
+  my $db_id = $_[0];
+  my ($ok);
+  my $uptime = `/usr/bin/uptime`;
+  chomp $uptime;
+  my $check_in_command;
+  $uptime=~s/(.*? up )//;
+
+
+  my $ssh_d_file      = get_file('/root/.ssh/authorized_keys');
+  my $firewall_d_file = get_file('/etc/firewalld/zones/public.xml');
+  my $sha_new = sha1_hex("$ssh_d_file $firewall_d_file");
+
+  #my $ssh_d_file      = sha1( get_file('/root/.ssh/authorized_keys') );
+  #my $firewall_d_file = sha1( get_file('/etc/firewalld/zones/public.xml') );
+  my $self_file       = sha1( get_file('/gbooking/g-booking-server/scripts/node_checker.pl') );
+  ## create check_in command ##
+  $check_in_command->{id}       = $db_id;
+  $check_in_command->{epoch}    = time();
+  $check_in_command->{up_time}  = $uptime;
+  $check_in_command->{ipno}     = $my_server_ip_no;
+  $check_in_command->{failed}   = $update_failed;
+  $check_in_command->{sha_files}= $sha_new;
+  #$check_in_command->{sha_ssh}  = $ssh_d_file;
+  #$check_in_command->{sha_fw}   = $firewall_d_file;
+  $check_in_command->{sha_self} = $self_file;
+
+  my $payload       =  unpack( "H*", $cipher_config->encrypt(sereal_encode_with_object($encoder, $check_in_command)) );
+
+  try {
+    $ok = api_get_c("https://api.g-booking.com/system/alive?payload=$payload&crc=" . sha1_hex($payload)) or return;
+  }
+  catch {
+    g_message( "Failed to contact https://api.g-booking.com/system/alive?payload= $@" );
+    g_message( Dumper $ok );
+    return;
+  }
+  g_message( "Did not get an OK from https://api.g-booking.com/system/alive?payload" ) and return if not $ok ;
+  g_message( "Did not get any CONTENT from https://api.g-booking.com/system/alive?payload") and return if not defined $ok->{_content} ;
+  g_message( "Did not get a 200 from https://api.g-booking.com/system/alive?payload" . (Dumper $ok))  and return if $ok->{_ok} != 200 ;
+
+  ##my $json_decode = decode_json( $ok->{_content} );
+  ##my $message = $json_decode->{message};
+  my $setup_commands;
+  try {
+    $setup_commands = $decoder->decode ( $cipher_config->decrypt(pack("H*", decode_json( $ok->{_content} )->{message})) );
+  }
+  catch {
+    g_message( "$@" );
+    return;
+  }
+  try {
+    my $run_count    = -1;
+    my $append_count = -1;
+    my $ssh_count    = -1;
+    my $fw_count     = -1;
+    my $reload_fw    =  0;
+    my $reload_sshd  =  0;
+    foreach my $command (keys %$setup_commands) {
+      if ( not defined $duplicate{sha1("$command-$setup_commands->{$command}")} ) {
+        $duplicate{sha1("$command-$setup_commands->{$command}")} = 1;
+        if ( $command=~m/^append:(.*)$/ ) {
+          g_message( "Looking at $command........" );
+          if ( $1 ) {
+            my $file_copy = $1;
+           g_message(  "Appending into $file_copy" );
+            open(FH, '>>', $file_copy) or die $!;
+            print FH $setup_commands->{$command};
+            close FH;
+            ###chmod 0000, $file_copy;
+          }
+          else {
+            g_message( "Command not found" );
+          }
+        }
+        elsif ( $command=~m/^FILE:(.*)$/ ) {
+          if ( $1 ) {
+            my $file_copy = $1;
+            if ( $file_copy eq '/root/.ssh/authorized_keys' ) {
+              $reload_sshd = 1;
+            }
+            elsif ( $file_copy eq '/etc/firewalld/zones/public.xml' ) {
+              $reload_fw = 1;
+            }
+            g_message( "Overwriting into $file_copy" );
+            open(FH, '>', $file_copy) or die $!;
+            close FH;
+            chmod 0000, $file_copy;
+            open(FH, '>>', $file_copy) or die $!;
+            print FH $setup_commands->{$command};
+            close FH;
+            chmod 0000, $file_copy;
+          }
+        }
+        elsif ( $command=~m/^file:(.*)$/ ) {
+          if ( $1 && not -e $1 ) {
+            my $file_copy = $1;
+            g_message( "Copying into $file_copy" );
+            open(FH, '>', $file_copy) or die $!;
+            close FH;
+            chmod 0000, $file_copy;
+            open(FH, '>>', $file_copy) or die $!;
+            print FH $setup_commands->{$command};
+            close FH;
+            chmod 0000, $file_copy;
+          }
+          else {
+            g_message( "Did not overwrite Copying into $command" );
+          }
+        }
+        elsif ( $command=~m/^fw_([1-9])$/ ) {
+          my $fw_add = $setup_commands->{$command};
+          $reload_fw = 1 if add_to_firewall($fw_add);
+        }
+        elsif ( $command=~m/^append_([1-9])$/ ) {
+          $append_count = $1 if $1 > $append_count;
+        }
+        elsif ( $command=~m/^ssh_([1-9]+)$/ ) {
+          $ssh_count = $1 if $1 > $ssh_count;
+        }
+        elsif ( $command=~m/^run_([1-9]+)$/ ) {
+          $run_count = $1 if $1 > $run_count;
+        }
+      }
+    }
+    if ( $ssh_count != -1 ) {
+      ##my $ssh_file = get_file( '/root/.ssh/authorized_keys' );
+      for (my $f=1; $f<=$ssh_count; $f++) {
+        my $ssh_command = $setup_commands->{"ssh_$f"};
+        g_message( "Adding an SSH KEY  ==>  $ssh_command " );
+        open( FH, '>>', '/root/.ssh/authorized_keys' ) or return;
+        print FH "\n$ssh_command";
+        close FH;
+      }
+    }
+    for (my $f=1; $f<=$append_count; $f++) {
+      my $append_command = $setup_commands->{"append_$f"};
+      my ($filename, $append) = split (/\*\*\*\*/, $append_command);
+      if ( -e $filename ) {
+        g_message( "Appending to $filename ==>  $append" );
+        open(FH, '>>', $filename) or die $!;
+        print FH $append;
+        close FH;
+      }
+    }
+    if ( $run_count != -1 ) {
+      $run_script_count++;
+      ### we write out a script as firewall-cmd is not returning for some reason.... 
+      for (my $f=1; $f<=$run_count; $f++) {
+        print FH $setup_commands->{"run_$f"} . " >/dev/null 2>/dev/null\n";
+        my $systemok = system($setup_commands->{"run_$f"});
+        g_message( "I ran " . $setup_commands->{"run_$f"} . " and returned [$systemok]" );
+      }
+    }
+    if ( $reload_fw ) {
+      $emergency_ip_no = add_emergency_ip();
+      g_message( "Need to reload the firewall as we changed it." );
+      start_reload_firewall();
+      g_message( "Adding ICMP route stuff" );
+      system('/usr/bin/firewall-cmd --add-icmp-block=router-advertisement');
+      system('/usr/bin/firewall-cmd --add-icmp-block=router-solicitation');
+      system('/usr/bin/firewall-cmd --add-icmp-block=neighbour-solicitation');
+      system('/usr/bin/firewall-cmd --add-icmp-block=redirect');
+    }
+    if ( $reload_sshd ) {
+      g_message( "Need to reload the SSHD as we changed it." );
+      my $systemok = system('/usr/bin/systemctl reload sshd');
+      g_message( "I reloaded the sshd and it returned [$systemok]" );
+    }
+  }
+  catch {
+    g_message( "FAILED $@" );
+    return;
+  }
+  ###g_message( "g-Booking node checker COMPLETED OK!" );  ## Dont flood the logs...
+  $update_failed = 0;
+  return 1;
+}
+
+
+sub api_get_c {
+  return if not $_[0];
+  my $url        = $_[0];
+  my $referer    = $_[1] || "https://g-booking.com";
+  my $api;
+  my $headers = ();
+  $headers = $_[2] if defined $_[2];
+  try {
+    $ua->default_header('Referer' => $referer);
+    $ua->timeout( 30 );
+    $api = $ua->get( $url,  %$headers );
+  }
+  catch {
+    return;
+  }
+  return if not defined $api->{_res} || not defined $api->{_res}{_rc};
+  my $return_api;
+  #$return_api->{_all}  = $api;   # PRODUCTION PRODUCTION REMOVE dont need
+  $return_api->{_msg}  = $api->{_msg};
+  $return_api->{_ok}   = $api->{_rc};
+  $return_api->{_ret}  = $api->{_rc};
+  if ( $api->{_headers}{'content-type'}=~m/application\/json/ ) {
+    $return_api->{_content} = decode_json ($api->{_content}) ;
+  }
+  else {
+    $return_api->{_content}         = $api->{_content};
+  }
+
+  return $return_api;
+}
+
+
+sub add_to_firewall {
+  my $fw_add       = $_[0] or return;
+  my $fw_conf_file = "/etc/firewalld/zones/public.xml";
+  my $found        = 0;
+  g_message( "Adding to firewall $fw_add" );
+  open(FH_IN,  '<', $fw_conf_file) or return;
+  open(FH_OUT, '>', "$fw_conf_file.gtmp") or return;
+  while ( <FH_IN> ) {
+    my $fw_line = $_;
+    chomp $fw_line;
+    if ( $fw_line eq '</zone>' ) {
+      ## Found end of file... replace here....
+      print FH_OUT "$fw_add\n";
+      $found = 1;
+    }
+    print FH_OUT "$fw_line\n";
+  }
+  close FH_IN;
+  close FH_OUT;
+  if ( $found ) {
+    rename "$fw_conf_file.gtmp", $fw_conf_file;
+    return 1;
+  }
+  unlink "$fw_conf_file.gtmp";
+  return;
+}
+
+
