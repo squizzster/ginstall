@@ -1,0 +1,14 @@
+[Unit]
+Description = g-Booking Node Checker. Every minute I check-in with central command.
+
+[Service]
+Type = notify
+ExecStart = /usr/local/bin/perl /root/node_checker
+ExecReload = /bin/kill -HUP $MAINPID
+WatchdogSec = 30
+
+
+[Install]
+WantedBy=multi-user.target
+
+
