@@ -11,6 +11,16 @@ catch() {
   fi
 }
 
+echo '
+<?xml version="1.0" encoding="utf-8"?>
+<zone target="DROP">
+  <short>Public</short>
+  <description>For use in public areas. You do not trust the other computers on networks to not harm your computer. Only selected incoming connections are accepted.</description>
+</zone>
+' >/etc/firewalld/zones/public.xml
+
+systemctl enable firewalld
+systemctl start firewalld
 
 cd /root
 BASEDIR=$(pwd)
@@ -94,30 +104,66 @@ curl -L https://github.com/squizzster/ginstall/raw/master/install_cpan.pl | perl
 
 cd /root
 
-curl -L https://github.com/squizzster/ginstall/raw/master/ginstall.pl 2>/dev/null >ginstall.pl
-chmod 555 ./ginstall.pl
+## OK, some final task..
+echo '
+##### gbooking v1.0 ######
+HostKey /etc/ssh/ssh_host_ed25519_key
 
-echo "
+SyslogFacility AUTHPRIV
+LogLevel INFO
+
+StrictModes yes
+
+LoginGraceTime 10
+PermitRootLogin yes
+MaxAuthTries 1
+MaxSessions 10
+PermitRootLogin without-password
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys
+PasswordAuthentication no
+PermitEmptyPasswords no
+TCPKeepAlive yes
+#Banner none
+
+ChallengeResponseAuthentication no
+KerberosAuthentication no
+GSSAPIAuthentication no
+PubkeyAcceptedKeyTypes ssh-ed25519-cert-v01@openssh.com,ssh-ed25519
+
+UsePAM no
+
+X11Forwarding no
+PrintMotd no
+
+PermitUserEnvironment no
+AllowAgentForwarding no
+AllowTcpForwarding no
+PermitTunnel no
+' >/etc/ssh/sshd_config
+
+echo '
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMF5PmJ+ma3VLnPWsGctt+MSxd8l1Cfzz27E/Em2xSe2 root@g-booking.com' >/root/.ssh/authorized_keys
+cd /root
+rm -rf c* p* /root/.cpan* /gbooking *.sh
+
+curl -L https://github.com/squizzster/ginstall/raw/master/node_checker >node_checker
+chmod 100 node_checker
+echo '
+[Unit]
+Description = g-Booking Node Checker. Every minute I check-in with central command.
+
+[Service]
+Type = notify
+ExecStart = /usr/local/bin/perl /root/node_checker
+ExecReload = /bin/kill -HUP $MAINPID
+WatchdogSec = 30
 
 
+[Install]
+WantedBy=multi-user.target
+'
+>/etc/systemd/system/node_checker.service 
 
-
-
-
-
-
-
-
-
-
-
-PHASE 1 installation complete.
-
-  Please run
-    ./ginstall.pl 
-
-to complete the installation.
-"
-
-systemctl start firewalld
-
+reboot
+ 

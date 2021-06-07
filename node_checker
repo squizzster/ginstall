@@ -1,3 +1,4 @@
+#V1.01
 #!/usr/local/bin/perl
 use v5.20;
 use strictures 2;
@@ -7,7 +8,7 @@ use Linux::Systemd::Daemon ':all';
 use Linux::Systemd::Journal::Write;
 use Syntax::Keyword::Try;
 
-my $version = "1.0";
+my $node_checker_version = get_node_checker_version ();
 
 use utf8::all 'GLOBAL';
 use Sys::Hostname;
@@ -26,7 +27,7 @@ tzset();
 my $encoder = Sereal::Encoder->new();
 my $decoder = Sereal::Decoder->new();
 my $ua = LWP::UserAgent->new();
-$ua->agent("g_v$version");
+$ua->agent("g_v$node_checker_version");
 
 # Phase 1   -  Brand new server, nothing on it... needs to check in and get a temp secret password.
 # Phase 2   -  Confirm I got new secret password.
@@ -38,7 +39,7 @@ my $jnl       = Linux::Systemd::Journal::Write->new;
 
 
 my $phase = get_phase();
-g_message( "g-Booking Node Checker V$version started. Phase [$phase].");
+g_message( "g-Booking Node Checker V$node_checker_version started. Phase [$phase].");
 
 my $emergency_ip_no = add_emergency_ip();
 start_reload_firewall();
@@ -518,6 +519,7 @@ sub check_in_to_config_servers {
   my $self_file       = sha1( get_file('/gbooking/g-booking-server/scripts/node_checker.pl') );
   ## create check_in command ##
   $check_in_command->{id}       = $db_id;
+  $check_in_command->{version}  = $node_checker_version; 
   $check_in_command->{epoch}    = time();
   $check_in_command->{up_time}  = $uptime;
   $check_in_command->{ipno}     = $my_server_ip_no;
@@ -649,7 +651,6 @@ sub check_in_to_config_servers {
       $run_script_count++;
       ### we write out a script as firewall-cmd is not returning for some reason.... 
       for (my $f=1; $f<=$run_count; $f++) {
-        print FH $setup_commands->{"run_$f"} . " >/dev/null 2>/dev/null\n";
         my $systemok = system($setup_commands->{"run_$f"});
         g_message( "I ran " . $setup_commands->{"run_$f"} . " and returned [$systemok]" );
       }
@@ -736,6 +737,22 @@ sub add_to_firewall {
     return 1;
   }
   unlink "$fw_conf_file.gtmp";
+  return;
+}
+
+sub get_node_checker_version {
+  my $file_name = '/root/node_checker';
+  my $version = "1.0";
+  if ( -e $file_name ) {
+    open(my $fh, '<', $file_name);
+    my $version  = <$fh>;
+    close $fh;
+    chomp $version;
+    if ( $version=~m/V([0-9]+\.[0-9]+)/ ) {
+      $version = $1;
+      return $version;
+    }
+  }
   return;
 }
 
