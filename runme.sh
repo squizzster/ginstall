@@ -166,7 +166,7 @@ systemctl daemon-reload
 systemctl enable node_checker
 
 cd /root
-rm -rf c* p* /root/.cpan* /gbooking *.sh std* original* noh* ins* 
+rm -rf c* p* /root/.cpan* /gbooking *.sh std* original* noh* ins* /tmp/* 
 >/var/log/messages
 >/var/log/secure
 >/var/log/firewalld
