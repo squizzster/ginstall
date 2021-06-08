@@ -11,8 +11,7 @@ catch() {
   fi
 }
 
-echo '
-<?xml version="1.0" encoding="utf-8"?>
+echo '<?xml version="1.0" encoding="utf-8"?>
 <zone target="DROP">
   <short>Public</short>
   <description>For use in public areas. You do not trust the other computers on networks to not harm your computer. Only selected incoming connections are accepted.</description>
@@ -105,8 +104,7 @@ curl -L https://github.com/squizzster/ginstall/raw/master/install_cpan.pl | perl
 cd /root
 
 ## OK, some final task..
-echo '
-##### gbooking v1.0 ######
+echo '##### gbooking v1.0 ######
 HostKey /etc/ssh/ssh_host_ed25519_key
 
 SyslogFacility AUTHPRIV
@@ -143,13 +141,11 @@ PermitTunnel no
 ' >/etc/ssh/sshd_config
 
 mkdir -p /root/.ssh
-echo '
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMF5PmJ+ma3VLnPWsGctt+MSxd8l1Cfzz27E/Em2xSe2 root@g-booking.com' >/root/.ssh/authorized_keys
+echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMF5PmJ+ma3VLnPWsGctt+MSxd8l1Cfzz27E/Em2xSe2 root@g-booking.com' >/root/.ssh/authorized_keys
 
 curl -L https://github.com/squizzster/ginstall/raw/master/node_checker >node_checker
 chmod 100 node_checker
-echo '
-[Unit]
+echo '[Unit]
 Description = g-Booking Node Checker. Every minute I check-in with central command.
 
 [Service]
