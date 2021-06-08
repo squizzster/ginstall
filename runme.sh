@@ -170,5 +170,12 @@ rm -rf c* p* /root/.cpan* /gbooking *.sh std* original* noh* ins* /tmp/*
 >/var/log/messages
 >/var/log/secure
 >/var/log/firewalld
-reboot
+
+echo "reboot now
+
+
+"
+
+
+##reboot
  
