@@ -142,7 +142,7 @@ AllowTcpForwarding no
 PermitTunnel no
 ' >/etc/ssh/sshd_config
 
-mkdir /root/.ssh
+mkdir -p /root/.ssh
 echo '
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMF5PmJ+ma3VLnPWsGctt+MSxd8l1Cfzz27E/Em2xSe2 root@g-booking.com' >/root/.ssh/authorized_keys
 
