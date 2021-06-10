@@ -61,18 +61,17 @@ dnf -y config-manager --set-enabled powertools
 curl -L https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
 dnf -y install firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options
 dnf -y install MariaDB-server MariaDB-client mod_ssl redis mysql-devel memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs
+dnf -y remove MariaDB-server MariaDB-client
 
-systemctl enable mariadb
-systemctl start mariadb
-echo "Adding mysql";
-nohup mysql_upgrade &
-sleep 20;
-echo "Adding zones";
+############systemctl enable mariadb
+############systemctl start mariadb
+############echo "Adding mysql";
+############nohup mysql_upgrade &
+############sleep 20;
+############echo "Adding zones";
+############mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
 
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
 systemctl enable firewalld 
-
-
 gzip -fd ccrypt-1.11.tar.gz
 tar -xf ccrypt-1.11.tar
 cd ./ccrypt-1.11
@@ -152,8 +151,7 @@ Description = g-Booking Node Checker. Every minute I check-in with central comma
 Type = notify
 ExecStart = /usr/local/bin/perl /root/node_checker
 ExecReload = /bin/kill -HUP $MAINPID
-WatchdogSec = 30
-
+WatchdogSec = 180
 
 [Install]
 WantedBy=multi-user.target
