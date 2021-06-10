@@ -61,7 +61,6 @@ dnf -y config-manager --set-enabled powertools
 curl -L https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
 dnf -y install firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options
 dnf -y install MariaDB-server MariaDB-client mod_ssl redis mysql-devel memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs
-dnf -y remove MariaDB-server MariaDB-client
 
 ############systemctl enable mariadb
 ############systemctl start mariadb
