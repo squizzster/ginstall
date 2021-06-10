@@ -136,7 +136,6 @@ sub cpan {
    'IO::Socket::SSL',
    'IO::Socket::Timeout',
    'IPC::Cmd',
-   'IPC::Shareable',
    'JSON',
    'JSON::XS',
    'Linux::Inotify2',

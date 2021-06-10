@@ -1,4 +1,4 @@
-#V1.20
+#V1.21
 #!/usr/local/bin/perl
 use v5.20;
 use strictures 2;
@@ -177,8 +177,14 @@ sub phase_1 {
   my $command;
   $command->{ipno}     = $ip_no;
   $command->{epoch}    = time();
-  $command->{uname}    = `/usr/bin/uname -a`;
   $command->{hostname} = $host_name;
+  $command->{uname}    = `/usr/bin/uname -a`;
+  if ( $command->{uname} =~m/Linux.*? .*?\.com ([0-9].*?) #/ ) {
+    ####print "--> $1\n";
+  }
+  else {
+    g_message(  "Could not find Linux version");
+  }
 
   ## Send a HELLO COMMAND message.....
    #   /system/server/config/phase_one
@@ -522,6 +528,14 @@ sub check_in_to_config_servers {
   chomp $uptime;
   my $check_in_command;
   $uptime=~s/(.*? up )//;
+  my $linux_version  = `/usr/bin/uname -a`;
+  if ( $linux_version =~m/Linux.*? .*?\.com ([0-9].*?) #/ ) {
+    $linux_version = $1;
+  }
+  else {
+    $linux_version = "unknown";
+  }
+
 
   ###########my $sql_check       = get_file('/etc/my.cnf.d/server.cnf');
   my $server_type     = get_file('/root/.server.type');
@@ -545,6 +559,7 @@ sub check_in_to_config_servers {
   $check_in_command->{sha_fw}   = sha1_hex( $firewall_d_file );
   $check_in_command->{sha_self} = sha1_hex( $self_file );
   $check_in_command->{type}     = $server_type;
+  $check_in_command->{os}       = $linux_version;
 
   my $payload       =  unpack( "H*", $cipher_config->encrypt(sereal_encode_with_object($encoder, $check_in_command)) );
 
