@@ -1,4 +1,4 @@
-#V1.01
+#V1.20
 #!/usr/local/bin/perl
 use v5.20;
 use strictures 2;
@@ -7,7 +7,7 @@ use experimental qw/smartmatch signatures/;
 use Linux::Systemd::Daemon ':all';
 use Linux::Systemd::Journal::Write;
 use Syntax::Keyword::Try;
-
+#### padding
 my $node_checker_version = get_node_checker_version ();
 
 use utf8::all 'GLOBAL';
@@ -36,8 +36,6 @@ $ua->agent("g_v$node_checker_version");
 # Phase 5   -  Ready to be configured based on utility of server.
 
 my $jnl       = Linux::Systemd::Journal::Write->new;
-
-
 my $phase = get_phase();
 g_message( "g-Booking Node Checker V$node_checker_version started. Phase [$phase].");
 
@@ -87,6 +85,7 @@ g_message( "Our own IP number is [$my_server_ip_no]" );
 
 my $update_failed = 0;
 my $sleep_time = 3;
+my $sleep_max  = 20;
 my $server_id = get_file( '/root/.server.id' );
 while ( 1 == 1 ) {
   ### TEST SQL
@@ -98,7 +97,7 @@ while ( 1 == 1 ) {
     $update_failed = 1;
   }
   $sleep_time += 2;
-  $sleep_time = 60 if $sleep_time>60;
+  $sleep_time = $sleep_max if $sleep_time > $sleep_max;
   ### we sleep for 1/3 as watchdog is 30 seconds...
   for (my $f=0; $f<3; $f++) {
     sleep int($sleep_time/3);
@@ -307,7 +306,7 @@ sub phase_3 {
   ## OK, we have our command and control list of commands TO DO!
   ## This is a bunch of files we need to write out...
   die "Bad ID" if $commands->{id} != $server_id;  # JIC I am an idiot somewhere!  (obviously it cannot happen which is why I checked for it)... erk
-  ## create rclone config directories in case the server wishes to configure rclone for this server.
+  ## create rclone config / sql directories in case the server wishes to configure rclone for this server.
   mkdir '/root/.config';
   mkdir '/root/.config/rclone';
 
@@ -456,6 +455,21 @@ sub get_file {
   return "";
 }
 
+sub write_read_only_file {
+  my $file_name    = $_[0] or return;
+  my $file_content = $_[1] or return;
+  g_message(  "Writing out read-only file [$file_name]");
+
+  open(FH, '>', $file_name) or die $!;
+  close FH;
+  chmod 0444, $file_name;
+
+  open(FH, '>>', $file_name) or die $!;
+  print FH $file_content;
+  close FH;
+  return 1;
+}
+
 sub write_protected_file {
   my $file_name    = $_[0] or return;
   my $file_content = $_[1] or return;
@@ -509,14 +523,16 @@ sub check_in_to_config_servers {
   my $check_in_command;
   $uptime=~s/(.*? up )//;
 
-
+  ###########my $sql_check       = get_file('/etc/my.cnf.d/server.cnf');
+  my $server_type     = get_file('/root/.server.type');
+  my $sql_check       = get_file('/root/.server.cnf');
   my $ssh_d_file      = get_file('/root/.ssh/authorized_keys');
   my $firewall_d_file = get_file('/etc/firewalld/zones/public.xml');
-  my $sha_new = sha1_hex("$ssh_d_file $firewall_d_file");
+  my $self_file       = get_file('/root/node_checker.pl');
 
-  #my $ssh_d_file      = sha1( get_file('/root/.ssh/authorized_keys') );
-  #my $firewall_d_file = sha1( get_file('/etc/firewalld/zones/public.xml') );
-  my $self_file       = sha1( get_file('/gbooking/g-booking-server/scripts/node_checker.pl') );
+  ## We do some g-booking specific stuff here.. .I could make this better but time is pressing on this... PRODUCTION
+  ## PRODUCTION PRODUCTION
+
   ## create check_in command ##
   $check_in_command->{id}       = $db_id;
   $check_in_command->{version}  = $node_checker_version; 
@@ -524,10 +540,11 @@ sub check_in_to_config_servers {
   $check_in_command->{up_time}  = $uptime;
   $check_in_command->{ipno}     = $my_server_ip_no;
   $check_in_command->{failed}   = $update_failed;
-  $check_in_command->{sha_files}= $sha_new;
-  #$check_in_command->{sha_ssh}  = $ssh_d_file;
-  #$check_in_command->{sha_fw}   = $firewall_d_file;
-  $check_in_command->{sha_self} = $self_file;
+  $check_in_command->{sha_files}= sha1_hex("$ssh_d_file $firewall_d_file $sql_check");
+  $check_in_command->{sha_ssh}  = sha1_hex( $ssh_d_file );
+  $check_in_command->{sha_fw}   = sha1_hex( $firewall_d_file );
+  $check_in_command->{sha_self} = sha1_hex( $self_file );
+  $check_in_command->{type}     = $server_type;
 
   my $payload       =  unpack( "H*", $cipher_config->encrypt(sereal_encode_with_object($encoder, $check_in_command)) );
 
@@ -558,13 +575,14 @@ sub check_in_to_config_servers {
     my $append_count = -1;
     my $ssh_count    = -1;
     my $fw_count     = -1;
+    my $reload_sql   =  0;
     my $reload_fw    =  0;
     my $reload_sshd  =  0;
     foreach my $command (keys %$setup_commands) {
       if ( not defined $duplicate{sha1("$command-$setup_commands->{$command}")} ) {
-        $duplicate{sha1("$command-$setup_commands->{$command}")} = 1;
+        g_message( "Looking at $command........" );
+        #####$duplicate{sha1("$command-$setup_commands->{$command}")} = 1;
         if ( $command=~m/^append:(.*)$/ ) {
-          g_message( "Looking at $command........" );
           if ( $1 ) {
             my $file_copy = $1;
            g_message(  "Appending into $file_copy" );
@@ -586,6 +604,10 @@ sub check_in_to_config_servers {
             elsif ( $file_copy eq '/etc/firewalld/zones/public.xml' ) {
               $reload_fw = 1;
             }
+            elsif ( $file_copy eq '/root/.server.cnf' ) {
+              $reload_sql = 1;
+            }
+
             g_message( "Overwriting into $file_copy" );
             open(FH, '>', $file_copy) or die $!;
             close FH;
@@ -599,6 +621,9 @@ sub check_in_to_config_servers {
         elsif ( $command=~m/^file:(.*)$/ ) {
           if ( $1 && not -e $1 ) {
             my $file_copy = $1;
+            if ( $file_copy eq '/root/.server.cnf' ) {
+              $reload_sql = 1;
+            }
             g_message( "Copying into $file_copy" );
             open(FH, '>', $file_copy) or die $!;
             close FH;
@@ -651,6 +676,7 @@ sub check_in_to_config_servers {
       $run_script_count++;
       ### we write out a script as firewall-cmd is not returning for some reason.... 
       for (my $f=1; $f<=$run_count; $f++) {
+        sd_notify( watchdog => 1, status => 'Running command [' . $setup_commands->{"run_$f"} . ']' );
         my $systemok = system($setup_commands->{"run_$f"});
         g_message( "I ran " . $setup_commands->{"run_$f"} . " and returned [$systemok]" );
       }
@@ -664,6 +690,22 @@ sub check_in_to_config_servers {
       system('/usr/bin/firewall-cmd --add-icmp-block=router-solicitation');
       system('/usr/bin/firewall-cmd --add-icmp-block=neighbour-solicitation');
       system('/usr/bin/firewall-cmd --add-icmp-block=redirect');
+    }
+    if ( $reload_sql ) { 
+      g_message( "Need to reload the SQL as we changed it." );
+      mkdir '/etc/my.cnf.d';
+      my $server_cnf;
+      $server_cnf = get_file('/root/.server.cnf');
+      my $tr_id = "_id_";
+      my $tr_ip = "_ipno_";
+      $server_cnf=~s/$tr_ip/$my_server_ip_no/;
+      $server_cnf=~s/$tr_id/$db_id/;
+      write_read_only_file( '/etc/my.cnf.d/server.cnf', $server_cnf );
+      if ( $server_type eq 'cluster' ) {
+        g_message ( "Server type is a cluster. Updated." );
+        #####system('nohup /usr/bin/systemctl restart mariadb &');
+        ###########system_ctl("restart", "mariadb");
+      }
     }
     if ( $reload_sshd ) {
       g_message( "Need to reload the SSHD as we changed it." );
