@@ -180,6 +180,7 @@ sub cpan {
    'Time::Seconds',
    'URI::Escape',
    'utf8::all',
+   'WebService::Linode',
    'WWW::Google::APIDiscovery',
    'WWW::Telegram::BotAPI',
    'DBD::MariaDB',

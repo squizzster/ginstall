@@ -1,4 +1,4 @@
-#V1.21
+#V1.22
 #!/usr/local/bin/perl
 use v5.20;
 use strictures 2;
@@ -224,6 +224,8 @@ sub phase_1 {
   g_message(  "g-Command has told me that I am server number [$commands->{id}]");
   write_protected_file( '/root/.server.id',  $commands->{id} );
   write_protected_file( '/root/.secret.id', $commands->{secret} );  ## unique tmp secret for next bit only.
+  ### Let's set the hostname here as well I think.
+  system("/usr/bin/hostnamectl set-hostname g$commands->{id}.g-booking.com");
   return 1;
 
 }
