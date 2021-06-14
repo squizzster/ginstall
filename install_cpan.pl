@@ -96,6 +96,7 @@ sub cpan {
    'Crypt::Mode::CBC',
    'Crypt::PRNG',
    'Crypt::RC4',
+   'Crypt::Twofish',
    'Crypt::RC4::XS',
    'Crypt::Rijndael',
    'Crypt::ScryptKDF',

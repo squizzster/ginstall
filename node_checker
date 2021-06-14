@@ -1,4 +1,4 @@
-#V1.22
+#V1.25
 #!/usr/local/bin/perl
 use v5.20;
 use strictures 2;
@@ -87,6 +87,12 @@ my $update_failed = 0;
 my $sleep_time = 3;
 my $sleep_max  = 20;
 my $server_id = get_file( '/root/.server.id' );
+
+my $ok = system("/usr/bin/hostnamectl set-hostname g$server_id.g-booking.com");
+g_message ("Setting hostname to g$server_id.g-booking.com   [$ok]");
+
+
+
 while ( 1 == 1 ) {
   ### TEST SQL
   ### TEST EVERYTHING LOCALLY
@@ -225,7 +231,8 @@ sub phase_1 {
   write_protected_file( '/root/.server.id',  $commands->{id} );
   write_protected_file( '/root/.secret.id', $commands->{secret} );  ## unique tmp secret for next bit only.
   ### Let's set the hostname here as well I think.
-  system("/usr/bin/hostnamectl set-hostname g$commands->{id}.g-booking.com");
+  my $ok = system("/usr/bin/hostnamectl set-hostname g$commands->{id}.g-booking.com");
+  g_message ("Setting hostname to g$commands->{id}.g-booking.com   [$ok]");
   return 1;
 
 }
@@ -720,8 +727,7 @@ sub check_in_to_config_servers {
       write_read_only_file( '/etc/my.cnf.d/server.cnf', $server_cnf );
       if ( $server_type eq 'cluster' ) {
         g_message ( "Server type is a cluster. Updated." );
-        #####system('nohup /usr/bin/systemctl restart mariadb &');
-        ###########system_ctl("restart", "mariadb");
+        ##system_ctl("restart", "mariadb");
       }
     }
     if ( $reload_sshd ) {
