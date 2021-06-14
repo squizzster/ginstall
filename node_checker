@@ -1,4 +1,4 @@
-#V1.25
+#V1.26
 #!/usr/local/bin/perl
 use v5.20;
 use strictures 2;
@@ -75,8 +75,9 @@ if ( $phase == 4 ) {
 my %duplicate;
 my $cipher_config = Crypt::CBC->new(
       -pass   => get_file( '/root/.ccrypt.gbooking.system.alive' ),
-      -cipher => 'Cipher::AES',
+      -cipher => 'Cipher::Twofish',
       -pbkdf  => 'pbkdf2',
+      -iter   => 768,
 );
 my $run_script_count=0;
 sd_ready();
