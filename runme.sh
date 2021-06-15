@@ -10,6 +10,7 @@ catch() {
     echo "Error $1 occurred on $2"
   fi
 }
+dnf -y install wget firewalld
 
 echo '<?xml version="1.0" encoding="utf-8"?>
 <zone target="DROP">
