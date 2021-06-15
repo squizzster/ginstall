@@ -1,4 +1,4 @@
-#V1.26
+#V1.28
 #!/usr/local/bin/perl
 use v5.20;
 use strictures 2;
@@ -71,6 +71,9 @@ if ( $phase == 4 ) {
 
 ## configured or not...
 ## ready for commands....
+
+## We re-started which is unusual... re-run the bench marks I guess...
+run_bench_marks();
 
 my %duplicate;
 my $cipher_config = Crypt::CBC->new(
@@ -570,6 +573,7 @@ sub check_in_to_config_servers {
   $check_in_command->{sha_self} = sha1_hex( $self_file );
   $check_in_command->{type}     = $server_type;
   $check_in_command->{os}       = $linux_version;
+  $check_in_command->{benchmark}= get_file('/root/.g_bench_marks.txt');
 
   my $payload       =  unpack( "H*", $cipher_config->encrypt(sereal_encode_with_object($encoder, $check_in_command)) );
 
@@ -822,4 +826,51 @@ sub get_node_checker_version {
   return;
 }
 
+sub run_bench_marks {
+  my ($cpu_events,  $mem_events,  $dsk_read,  $dsk_write) = "0.00";
 
+  sd_notify(starting => 1, status => 'Running CPU bench_marks...');
+  my $test_cpu   = `/usr/bin/sysbench cpu    run`;
+
+  sd_notify(starting => 1, status => 'Running MEMORY bench_marks...');
+  my $test_mem   = `/usr/bin/sysbench memory run`;
+
+
+  sd_notify(starting => 1, status => 'Preparing DISK bench_marks...');
+  mkdir "/g_test"; 
+  chdir "/g_test";
+  my $test_dsk_p = `/usr/bin/sysbench fileio --file-total-size=5G prepare`;
+
+  sd_notify(starting => 1, status => 'Running DISK bench_marks...');
+  my $test_dsk   = `/usr/bin/sysbench fileio --file-total-size=5G --file-test-mode=rndrw --time=60 --max-requests=0 run`;
+
+  sd_notify(starting => 1, status => 'Cleaning DISK bench_marks...');
+  my $test_dsk_c = `/usr/bin/sysbench fileio --file-total-size=5G cleanup`;
+  rmdir "/g_test";
+
+  if ( $test_cpu=~m/events per second:.*?([0-9]+\.[0-9][0-9])/ ) {
+    #   events per second:  1273.06
+    $cpu_events = $1;
+  }
+
+  if ( $test_mem=~m/total number of events:.*?([0-9]+)/ ) {
+    #   total number of events:              59926203
+    $mem_events = $1;
+  }
+
+  if ( $test_dsk =~m/read, MiB.*?([0-9]+\.[0-9][0-9])/ ) {
+    # read, MiB/s:                  4.28
+    $dsk_read = $1;
+  }
+
+  if ( $test_dsk=~m/written, MiB.*?([0-9]+\.[0-9][0-9])/ ) {
+    # written, MiB/s:               2.86
+    $dsk_write = $1;
+  }
+
+  open(FH, '>', "/root/.g_bench_marks.txt") or die $!;
+  print FH "$cpu_events:$mem_events:$dsk_read:$dsk_write";
+  #cpu_events¬mem_events¬dsk_read¬dsk_write\n";
+  close FH;
+  chmod 0444, "/root/.g_bench_marks.txt";
+}
