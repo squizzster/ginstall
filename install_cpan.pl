@@ -23,19 +23,19 @@ sub eval_and_install {
   eval "use $cpan_module;";
   if ( $@ ) {
     $count++;
-    print "it failed. Attemtping install...";
+    print "Installing...";
     my $ok = `cpanm --mirror file:///gbooking/g-booking-server/install/cpan $cpan_module`;
     #Fetching file:///gbooking/g-booking-server/install/cpan/authors/id/T/TT/TTAR/Crypt-OpenSSL-AES-0.02.tar.gz ... FAIL
     if ( $ok=~m/FAIL$/ ) {
       if ( $ok=~m/(\/gbooking\/.*?authors\/id\/.*?)-[0-9]/ ) {
         my $file = $1;
-        print "Attemping install directly from download directory $file...";
+        ###print "Attemping install directly from download directory $file...";
         my $ok = `cpanm --mirror file:///gbooking/g-booking-server/install/cpan $file*`;
         if ( $ok eq '' ) {
           print "FAILED on $file\n";
         }
         else {
-          print "Maybe OK!\n";
+          print "OK!\n";
         }
       }
     }
@@ -84,7 +84,6 @@ sub check_and_create {
 sub cpan {
   @cpan = (
    'Test::Needs',
-   'autodie',
    'Crypt::OpenSSL::AES',
    'Capture::Tiny',
    'Carp',
