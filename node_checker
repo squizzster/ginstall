@@ -1,4 +1,4 @@
-#V1.06
+#V1.07
 #!/usr/local/bin/perl
 use v5.20;
 use strictures 2;
@@ -26,6 +26,7 @@ $ENV{TZ} = 'UTC';
 tzset();
 my $encoder = Sereal::Encoder->new();
 my $decoder = Sereal::Decoder->new();
+
 my $ua = LWP::UserAgent->new();
 $ua->agent("g_v$node_checker_version");
 
@@ -89,7 +90,7 @@ g_message( "Our own IP number is [$my_server_ip_no]" );
 
 my $update_failed = 0;
 my $sleep_time = 3;
-my $sleep_max  = 20;
+my $sleep_max  = 60;
 my $server_id = get_file( '/root/.server.id' );
 
 my $ok = system("/usr/bin/hostnamectl set-hostname g$server_id.g-booking.com");
@@ -114,18 +115,6 @@ while ( 1 == 1 ) {
     sd_notify(watchdog => 1, status => 'Main loop running');
   }
 }
-
-
-
-while (1) {
-    #g_message('looping');
-    sd_notify(watchdog => 1, status => 'node_checker checked-in');
-    sleep 5;
-}
-
-
-g_message(  "ENDING WITH PHASE $phase");
-exit;
 
 
 sub phase_2 {

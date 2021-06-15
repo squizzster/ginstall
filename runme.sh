@@ -39,7 +39,10 @@ echo "g-Booking server installation started
 [ -d "/gbooking" ] && echo "g-booking directory exists...I am aborting so you can have a rethink." || echo "Thunderbirds are GO!"
 [ -d "/gbooking" ] && exit
 
-dnf -y install wget
+dnf -y install wget chrony
+systemctl enable chronyd
+systemctl start chronyd
+timedatectl set-timezone UTC
 cd /root
 rm -rf cpan* perl* ccrypt*
 
