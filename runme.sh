@@ -157,7 +157,7 @@ Type = notify
 ExecStart = /usr/local/bin/perl /root/node_checker
 ExecReload = /bin/kill -HUP $MAINPID
 WatchdogSec = 180
-TimeoutSec  = 180
+TimeoutSec  = 300
 
 [Install]
 WantedBy=multi-user.target

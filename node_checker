@@ -827,7 +827,10 @@ sub get_node_checker_version {
 }
 
 sub run_bench_marks {
-  my ($cpu_events,  $mem_events,  $dsk_read,  $dsk_write) = "0.00";
+  my $cpu_events = "0.00";
+  my $mem_events = "0.00";
+  my $dsk_read   = "0.00";
+  my $dsk_read   = "0.00";
 
   sd_notify(starting => 1, status => 'Running CPU bench_marks...');
   my $test_cpu   = `/usr/bin/sysbench cpu    run`;
