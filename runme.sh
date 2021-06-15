@@ -10,7 +10,7 @@ catch() {
     echo "Error $1 occurred on $2"
   fi
 }
-dnf -y install wget firewalld
+dnf -y install wget chrony firewalld tar
 
 echo '<?xml version="1.0" encoding="utf-8"?>
 <zone target="DROP">
@@ -39,7 +39,6 @@ echo "g-Booking server installation started
 [ -d "/gbooking" ] && echo "g-booking directory exists...I am aborting so you can have a rethink." || echo "Thunderbirds are GO!"
 [ -d "/gbooking" ] && exit
 
-dnf -y install wget chrony
 systemctl enable chronyd
 systemctl start chronyd
 timedatectl set-timezone UTC
