@@ -169,6 +169,13 @@ rm -rf c* p* /root/.cpan* /gbooking *.sh std* original* noh* ins* /tmp/*
 >/var/log/secure
 >/var/log/firewalld
 
+echo "
+
+running some benchmarks whilst everything is quiet...
+";
+
+curl -L https://github.com/squizzster/ginstall/raw/master/bench_mark.pl | /usr/local/bin/perl 
+
 echo "reboot now
 
 
