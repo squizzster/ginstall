@@ -1,4 +1,4 @@
-#V1.00
+#V1.02
 #!/usr/local/bin/perl
 use v5.20;
 use strictures 2;
@@ -839,13 +839,13 @@ sub run_bench_marks {
   sd_notify(starting => 1, status => 'Preparing DISK bench_marks...');
   mkdir "/g_test"; 
   chdir "/g_test";
-  my $test_dsk_p = `/usr/bin/sysbench fileio --file-total-size=5G prepare`;
+  my $test_dsk_p = `/usr/bin/sysbench fileio --file-total-size=10G prepare`;
 
   sd_notify(starting => 1, status => 'Running DISK bench_marks...');
-  my $test_dsk   = `/usr/bin/sysbench fileio --file-total-size=5G --file-test-mode=rndrw --time=60 --max-requests=0 run`;
+  my $test_dsk   = `/usr/bin/sysbench fileio --file-total-size=10G --file-test-mode=rndrw --time=60 --max-requests=0 run`;
 
   sd_notify(starting => 1, status => 'Cleaning DISK bench_marks...');
-  my $test_dsk_c = `/usr/bin/sysbench fileio --file-total-size=5G cleanup`;
+  my $test_dsk_c = `/usr/bin/sysbench fileio --file-total-size=10G cleanup`;
   rmdir "/g_test";
 
   if ( $test_cpu=~m/events per second:.*?([0-9]+\.[0-9][0-9])/ ) {
