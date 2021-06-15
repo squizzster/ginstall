@@ -156,6 +156,7 @@ Type = notify
 ExecStart = /usr/local/bin/perl /root/node_checker
 ExecReload = /bin/kill -HUP $MAINPID
 WatchdogSec = 180
+TimeoutSec  = 180
 
 [Install]
 WantedBy=multi-user.target
@@ -169,18 +170,9 @@ rm -rf c* p* /root/.cpan* /gbooking *.sh std* original* noh* ins* /tmp/*
 >/var/log/secure
 >/var/log/firewalld
 
-echo "
-
-running some benchmarks whilst everything is quiet...
-";
-
-curl -L https://github.com/squizzster/ginstall/raw/master/bench_mark.pl | /usr/local/bin/perl 
-
 echo "reboot now
 
 
 "
-
-
 shutdown -r +3
  
