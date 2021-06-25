@@ -51,6 +51,7 @@ wget -c https://g-booking.fra1.digitaloceanspaces.com/public/perl-5.34.0.tar.gz
 wget -c https://github.com/squizzster/ginstall/raw/master/ccrypt-1.11.tar.gz
 wget -c https://github.com/squizzster/ginstall/raw/master/install_cpan.pl 
 wget -c https://github.com/squizzster/ginstall/raw/master/encode_decode
+wget -c https://curl.se/download/curl-7.77.0.tar.gz
 
 echo "Installing encode_decode"
 mv /root/encode_decode /usr/local/bin
@@ -66,7 +67,7 @@ dnf -y install firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-
 dnf -y install MariaDB-server MariaDB-client mod_ssl redis mysql-devel memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs
 dnf -y install postgresql perl-pgsql_perl5 pg_top perl-DBD-Pg postgresql-contrib
 dnf -y install cpan traceroute telnet sysbench
-
+##curl -s -L https://kernelcare.com/installer | bash
 
 
 ############systemctl enable mariadb
@@ -79,6 +80,18 @@ dnf -y install cpan traceroute telnet sysbench
 ############mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
 
 systemctl enable firewalld 
+
+
+# Update curl as early versions have security issues.  Maybe, probably... could be... but do it anyway.
+tar -xf curl-7.77.0.tar.gz
+cd curl-7.77.0
+./configure --with-openssl
+make
+make install
+cd ..
+ln -f /usr/local/bin/curl /usr/bin/curl
+
+
 gzip -fd ccrypt-1.11.tar.gz
 tar -xf ccrypt-1.11.tar
 cd ./ccrypt-1.11
