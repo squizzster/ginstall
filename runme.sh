@@ -11,13 +11,21 @@ catch() {
   fi
 }
 dnf -y install wget chrony firewalld tar
-
+EIP=`dig emergency.g-booking.com +short`
 echo '<?xml version="1.0" encoding="utf-8"?>
 <zone target="DROP">
   <short>Public</short>
   <description>For use in public areas. You do not trust the other computers on networks to not harm your computer. Only selected incoming connections are accepted.</description>
+
+ <rule family="ipv4">
+    <source address="' >/etc/firewalld/zones/public.xml
+echo $EIP >>/etc/firewalld/zones/public.xml
+echo '"/>
+    <port port="22" protocol="tcp"/>
+    <accept/>
+  </rule>
 </zone>
-' >/etc/firewalld/zones/public.xml
+' >>/etc/firewalld/zones/public.xml
 
 systemctl enable firewalld
 systemctl start firewalld
