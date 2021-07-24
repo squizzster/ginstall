@@ -1,5 +1,5 @@
-#V1.08
 #!/usr/local/bin/perl
+#V1.09
 use v5.20;
 use strictures 2;
 use sigtrap qw/handler handle_signal normal-signals/;
@@ -14,7 +14,7 @@ use utf8::all 'GLOBAL';
 use Sys::Hostname;
 use Socket;
 use Data::Dumper;
-use String::Random qw(random_string);
+#use String::Random qw(random_string);
 use Crypt::CBC;
 use Sereal::Encoder qw(:all);
 use Sereal::Decoder qw(:all);
@@ -102,10 +102,13 @@ while ( 1 == 1 ) {
   ### TEST SQL
   ### TEST EVERYTHING LOCALLY
   if ( check_in_to_config_servers($server_id) ) {
+    $sleep_time = 60;
   }
   else {
     g_message( "We failed an update....resetting...." );
     $update_failed = 1;
+    $sleep_time += 2;
+    $sleep_time = 180 if $sleep_time >180;
   }
   $sleep_time += 2;
   $sleep_time = $sleep_max if $sleep_time > $sleep_max;
@@ -136,7 +139,7 @@ sub phase_2 {
   my $command;
   $command->{epoch}   = time();
   $command->{id}      = $server_id;
-  $command->{random}  = random_string("...........................................................");
+  ###$command->{random}  = random_string("...........................................................");
   ## This just changes server status within the time limit of spin up.
   my $response = get("https://api.g-booking.com/system/server/config/phase_two?id=$server_id&payload=" . unpack( "H*", $cipher_secret->encrypt(sereal_encode_with_object($encoder, $command))));
   if ( $response->{_ok} != 200 ) {
@@ -805,6 +808,7 @@ sub get_node_checker_version {
   if ( -e $file_name ) {
     open(my $fh, '<', $file_name);
     my $version  = <$fh>;
+    $version  = <$fh>;
     close $fh;
     chomp $version;
     if ( $version=~m/V([0-9]+\.[0-9]+)/ ) {

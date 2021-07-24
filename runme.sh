@@ -66,19 +66,19 @@ curl -L https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
 dnf -y install firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options
 dnf -y install MariaDB-server MariaDB-client mod_ssl redis mysql-devel memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs
 dnf -y install postgresql perl-pgsql_perl5 pg_top perl-DBD-Pg postgresql-contrib
-dnf -y install cpan traceroute telnet sysbench
-##curl -s -L https://kernelcare.com/installer | bash
+dnf -y install cpan traceroute telnet sysbench  java-11-openjdk  libpng-devel
 
 
-############systemctl enable mariadb
-############systemctl start mariadb
-############echo "Adding mysql";
-############nohup mysql_upgrade &
-###################################     mysql_secure_installation
-############sleep 20;
-############echo "Adding zones";
-############mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
-
+systemctl enable mariadb
+systemctl start mariadb
+echo "Adding mysql";
+nohup mysql_upgrade &
+mysql_secure_installation
+sleep 20;
+echo "Adding zones";
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
+systemctl stop mariadb
+systemctl disable mariadb
 systemctl enable firewalld 
 
 
@@ -122,7 +122,89 @@ curl -L https://github.com/squizzster/ginstall/raw/master/install_cpan.pl | perl
 
 cd /root
 
-## OK, some final task..
+#wget https://apache.mirrors.nublue.co.uk/kafka/2.8.0/kafka_2.13-2.8.0.tgz
+#tar -xf kafka_2.13-2.8.0.tgz
+#mv kafka_2.13-2.8.0 /usr/local/kafka
+#echo '[Unit]
+#Description=Apache Zookeeper server
+#Documentation=http://zookeeper.apache.org
+#Requires=network.target remote-fs.target
+#After=network.target remote-fs.target
+#
+#[Service]
+#Type=simple
+#ExecStart=/usr/bin/bash /usr/local/kafka/bin/zookeeper-server-start.sh /usr/local/kafka/config/zookeeper.properties
+#ExecStop=/usr/bin/bash /usr/local/kafka/bin/zookeeper-server-stop.sh
+#Restart=on-abnormal
+#
+#[Install]
+#WantedBy=multi-user.target' >/etc/systemd/system/zookeeper.service
+#
+#echo '[Unit]
+#Description=Apache Kafka Server
+#Documentation=http://kafka.apache.org/documentation.html
+#Requires=zookeeper.service
+#
+#[Service]
+#Type=simple
+#Environment="JAVA_HOME=/usr/lib/jvm/jre-11-openjdk"
+#ExecStart=/usr/bin/bash /usr/local/kafka/bin/kafka-server-start.sh /usr/local/kafka/config/server.properties
+#ExecStop=/usr/bin/bash /usr/local/kafka/bin/kafka-server-stop.sh
+#
+#[Install]
+#WantedBy=multi-user.target' >/etc/systemd/system/kafka.service
+#
+##systemctl daemon-reload
+##systemctl enable zookeeper
+##systemctl enable kafka
+##systemctl start zookeeper
+##systemctl start kafka
+#sudo tee /etc/yum.repos.d/rabbitmq_erlang.repo<<EOF
+#[rabbitmq_erlang]
+#name=rabbitmq_erlang
+#baseurl=https://packagecloud.io/rabbitmq/erlang/el/8/x86_64
+#repo_gpgcheck=1
+#gpgcheck=1
+#enabled=1
+## PackageCloud's repository key and RabbitMQ package signing key
+#gpgkey=https://packagecloud.io/rabbitmq/erlang/gpgkey
+       #https://dl.bintray.com/rabbitmq/Keys/rabbitmq-release-signing-key.asc
+#sslverify=1
+#sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+#metadata_expire=300
+#
+#[rabbitmq_erlang-source]
+#name=rabbitmq_erlang-source
+#baseurl=https://packagecloud.io/rabbitmq/erlang/el/8/SRPMS
+#repo_gpgcheck=1
+#gpgcheck=0
+#enabled=1
+## PackageCloud's repository key and RabbitMQ package signing key
+#gpgkey=https://packagecloud.io/rabbitmq/erlang/gpgkey
+       #https://dl.bintray.com/rabbitmq/Keys/rabbitmq-release-signing-key.asc
+#sslverify=1
+#sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+#metadata_expire=300
+#EOF
+#
+#sudo yum clean all
+#sudo yum -y makecache
+#
+#curl -s https://packagecloud.io/install/repositories/rabbitmq/rabbitmq-server/script.rpm.sh | sudo bash
+#dnf makecache -y --disablerepo='*' --enablerepo='rabbitmq_rabbitmq-server'
+#dnf -y install --nogpgcheck erlang
+#dnf -y install rabbitmq-server
+#
+##systemctl enable --now rabbitmq-server.service
+#
+#
+#
+#
+#
+#
+#
+#
+### OK, some final task..
 echo '##### gbooking v1.0 ######
 HostKey /etc/ssh/ssh_host_ed25519_key
 
@@ -171,8 +253,8 @@ Description = g-Booking Node Checker. Every minute I check-in with central comma
 Type = notify
 ExecStart = /usr/local/bin/perl /root/node_checker
 ExecReload = /bin/kill -HUP $MAINPID
-WatchdogSec = 180
-TimeoutSec  = 300
+WatchdogSec = 120
+TimeoutSec  = 500
 
 [Install]
 WantedBy=multi-user.target
