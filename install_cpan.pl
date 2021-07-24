@@ -148,6 +148,7 @@ sub cpan {
    'LWP::Debug',
    'LWP::Simple',
    'LWP::UserAgent',
+   'LWP::Protocol::https',
    'MIME::Base64',
    'Mojolicious',
    'Mojo::Redis',
