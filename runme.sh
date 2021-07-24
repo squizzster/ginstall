@@ -10,17 +10,18 @@ catch() {
     echo "Error $1 occurred on $2"
   fi
 }
-dnf -y install wget chrony firewalld tar
+dnf -y install wget chrony firewalld tar bind-utils.x86_64
 EIP=`dig emergency.g-booking.com +short`
-echo '<?xml version="1.0" encoding="utf-8"?>
+echo -e '<?xml version="1.0" encoding="utf-8"?>
 <zone target="DROP">
   <short>Public</short>
   <description>For use in public areas. You do not trust the other computers on networks to not harm your computer. Only selected incoming connections are accepted.</description>
 
  <rule family="ipv4">
     <source address="' >/etc/firewalld/zones/public.xml
-echo $EIP >>/etc/firewalld/zones/public.xml
-echo '"/>
+
+echo -e $EIP >>/etc/firewalld/zones/public.xml
+echo -e '"/>
     <port port="22" protocol="tcp"/>
     <accept/>
   </rule>
