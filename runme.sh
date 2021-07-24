@@ -73,7 +73,7 @@ systemctl enable mariadb
 systemctl start mariadb
 echo "Adding mysql";
 nohup mysql_upgrade &
-mysql_secure_installation
+#mysql_secure_installation
 sleep 20;
 echo "Adding zones";
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
