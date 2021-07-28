@@ -262,8 +262,8 @@ Description = g-Booking Node Checker. Every minute I check-in with central comma
 Type = notify
 ExecStart = /usr/local/bin/perl /root/node_checker
 ExecReload = /bin/kill -HUP $MAINPID
-WatchdogSec = 120
-TimeoutSec  = 500
+WatchdogSec = 180
+TimeoutSec  = 400
 
 [Install]
 WantedBy=multi-user.target
