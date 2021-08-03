@@ -74,8 +74,10 @@ dnf -y config-manager --set-enabled powertools
 curl -L https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
 dnf -y install firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options
 dnf -y install MariaDB-server MariaDB-client mod_ssl redis mysql-devel memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs
-dnf -y install postgresql perl-pgsql_perl5 pg_top perl-DBD-Pg postgresql-contrib
-dnf -y install cpan traceroute telnet sysbench  java-11-openjdk  libpng-devel
+dnf -y install cpan traceroute telnet sysbench libpng-devel zlib-devel 
+
+## Postgres not used at moment
+##dnf -y install postgresql perl-pgsql_perl5 pg_top perl-DBD-Pg postgresql-contrib java-11-openjdk 
 
 
 systemctl enable mariadb
@@ -272,6 +274,23 @@ systemctl daemon-reload
 systemctl enable node_checker
 
 cd /root
+
+#wget https://www.openssl.org/source/openssl-1.1.1k.tar.gz
+#tar -xf openssl-1.1.1k.tar.gz
+#rm openssl-1.1.1k.tar.gz
+#cd openssl-*
+#./config --prefix=/usr/local/ssl --openssldir=/usr/local/ssl shared zlib
+#make
+#make test
+#make install
+
+#cd /root
+
+
+
+
+
+
 rm -rf c* p* /root/.cpan* /gbooking *.sh std* original* noh* ins* /tmp/* 
 >/var/log/messages
 >/var/log/secure
