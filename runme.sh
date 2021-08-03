@@ -277,9 +277,12 @@ rm -rf c* p* /root/.cpan* /gbooking *.sh std* original* noh* ins* /tmp/*
 >/var/log/secure
 >/var/log/firewalld
 
-echo "reboot now
+echo "
 
+rebooting in 1 minute... use shutdown -c    to cancel.
+rebooting in 1 minute... use shutdown -c    to cancel.
+rebooting in 1 minute... use shutdown -c    to cancel.
 
 "
-shutdown -r +3
+shutdown -r +1
  

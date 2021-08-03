@@ -1,6 +1,26 @@
 #!/usr/local/bin/perl
 use strict;
 
+
+chdir "/root";
+my $ok = `wget -c https://github.com/squizzster/ginstall/raw/master/cpan.tar`;
+
+if (!-e "cpan.tar")  {
+  print "CPAN TAR does not exist\n";
+  exit 1;
+}
+`mkdir -p /gbooking/g-booking-server/install/cpan`;
+if (!-e "/gbooking/g-booking-server/install/cpan")  {
+  print "CPAN TAR does not exist\n";
+  exit 1;
+}
+
+
+chdir "/gbooking/g-booking-server/install/cpan" or exit 1;
+
+$ok = `tar -xf  /root/cpan.tar`;
+$ok = `rm -f    /root/cpan.tar`;
+
 print "g-booking CPAN installation via evaluation STARTED!\n";
 my $count = 0;
 my @cpan;
@@ -12,10 +32,8 @@ foreach my $cpan_module (@cpan) {
   eval_and_install($cpan_module);
 }
 
-#foreach my $cpan_module (@cpan) {
-  #print "Attempting [$cpan_module]....";
-  #eval_and_install($cpan_module);
-#}
+$ok = `rm -rf /gbooking/g-booking-server/install`;
+
 
 sub eval_and_install {
   my $cpan_module = $_[0];
@@ -83,6 +101,7 @@ sub check_and_create {
 
 sub cpan {
   @cpan = (
+   'Type::Tiny::XS',
    'Test::Needs',
    'Crypt::OpenSSL::AES',
    'Capture::Tiny',

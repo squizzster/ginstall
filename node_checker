@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-#V1.01
+#V1.06
 use v5.20;
 use strictures 2;
 use sigtrap qw/handler handle_signal normal-signals/;
@@ -24,7 +24,8 @@ use Digest::SHA1  qw(sha1 sha1_hex sha1_base64);
 use POSIX;
 $ENV{TZ} = 'UTC';
 tzset();
-my $encoder = Sereal::Encoder->new();
+my $encoder = Sereal::Encoder->new( { compress_threshold=>0, compress =>  SRL_ZSTD, } );
+#############my $encoder = Sereal::Encoder->new();
 my $decoder = Sereal::Decoder->new();
 
 my $ua = LWP::UserAgent->new();
@@ -92,6 +93,7 @@ sd_ready();
 g_message( "g-booking NODE CHECKER is starting" );
 g_message( "Our own IP number is [$my_server_ip_no]" );
 
+my $first_time =    1;
 my $update_failed = 0;
 my $sleep_time = 3;
 my $sleep_max  = 60;
@@ -167,8 +169,19 @@ sub phase_1 {
   my $ip_no     = $_[0] or return;
   my $host_name = $_[1] or return;
   g_message(  "Attempting first time g-server check-in for [$ip_no]");
-  ## We use AES encrpytion to perform an initial check-in using a SHA1 of our IPNO.
-  ## Everything is over SSL anyway, so this is precautionary and the "secret" is also temporary. ;-)
+  ## We use AES encrpytion to perform an initial check-in using a SHA1 of our IP_NO and HOST_NAME.
+  ## Everything is over SSL anyway, so this is precautionary and as a starting key exchange 
+  #  well there are about 4 billion possible combinations assuming you know it's a SHA HASH of an IP_NO in the first place.
+  ## It will return a session secret to me which I then use until the final command codes are released to g-booking.
+  #
+  # So check in over SSL and say HELLO -- this server IP and hostname must be in g-booking command database to continue and it must check in within 3 minutes of being spun up.
+  # Then HELLO is OK... session secret released....
+  # Server is configured using session secret. Session secret is manipulated after transmission as well.
+  # And final server specific command codes are released to g-booking to become a fully fledged server.
+  # Something like that anyway...
+  # It doesn't quite do all this at the moment but it's close...   PRODCUTION PRODUCTION PRODCTION.  Finish security on this script.
+  # For now, it is impossibly highly secure anyway and well beyond any possible attack in reality.
+  #
   my $cipher_who_am_i = Crypt::CBC->new(
         -pass   => sha1($ip_no),
         -cipher => 'Cipher::AES',
@@ -540,7 +553,7 @@ sub check_in_to_config_servers {
   else {
     $linux_version = "unknown";
   }
-
+  my $cpu_info = get_cpu_info() if $first_time;
 
   ###########my $sql_check       = get_file('/etc/my.cnf.d/server.cnf');
   my $server_type     = get_file('/root/.server.type');
@@ -567,6 +580,7 @@ sub check_in_to_config_servers {
   $check_in_command->{os}       = $linux_version;
   $check_in_command->{benchmark}= get_file('/root/.g_bench_marks.txt');
   $check_in_command->{load_avg} = get_load_average();
+  $check_in_command->{cpu_info} = $cpu_info if $cpu_info;
 
 
   my $payload       =  unpack( "H*", $cipher_config->encrypt(sereal_encode_with_object($encoder, $check_in_command)) );
@@ -740,6 +754,7 @@ sub check_in_to_config_servers {
     return;
   }
   ###g_message( "g-Booking node checker COMPLETED OK!" );  ## Dont flood the logs...
+  $first_time    = 0;
   $update_failed = 0;
   return 1;
 }
@@ -752,6 +767,20 @@ sub get_load_average {
   chomp $load_avg;
   return $load_avg;
 }
+
+
+
+sub get_cpu_info {
+  my $cpu_info;
+  open(my $fh, "/proc/cpuinfo") or return;
+  my $read  = read ($fh, $cpu_info, 10000); ## cannot be more than 10k ish
+  close $fh;
+  return $cpu_info;
+}
+
+
+
+
 
 
 sub api_get_c {
