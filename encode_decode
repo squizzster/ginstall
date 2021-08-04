@@ -12,6 +12,11 @@ exit 1 if not encrypt_or_decrypt();
 exit 0;
 
 sub encrypt_or_decrypt {
+  ## we add 512 bytes of binary data to the start and end of the data-stream
+  ## so in addition to the various computations we add in binary data... not entirely sure
+  ## how much of a diffence this makes but it definitely doesn't make it easier regardless!
+  ##
+
   my $cipher = Crypt::CBC->new( -pass   => $crypt_1,
                                 -cipher => 'Cipher::AES',
                                 -pbkdf  => 'pbkdf2',
@@ -23,7 +28,8 @@ sub encrypt_or_decrypt {
   
   if ( $header_buffer eq $header ) {
     my $bytes      = read (STDIN, my $encrypted_text, 462144000);
-    print $cipher->decrypt(RC4($crypt_2, pack("H*", $encrypted_text) ));
+    my $decoded  = $cipher->decrypt(RC4($crypt_2, pack("H*", $encrypted_text) ));
+    print substr($decoded,512, (length($decoded) - 1024) );
     return 1;
   }
   else {
@@ -33,7 +39,12 @@ sub encrypt_or_decrypt {
       exit 1;
     }
     print $header;
-    print  unpack("H*", RC4($crypt_2, $cipher->encrypt($header_buffer . $tmp_buffer) )); 
+    my $binary = "b" x 512;  # for string random.
+    use String::Random;
+    my $pass = String::Random->new;
+    my $string_pre  = $pass->randpattern($binary);
+    my $string_post = $pass->randpattern($binary);
+    print  unpack("H*", RC4($crypt_2, $cipher->encrypt($string_pre . $header_buffer . $tmp_buffer . $string_post) )); 
     return 1;
   }
 }
