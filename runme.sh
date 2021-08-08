@@ -309,5 +309,5 @@ rebooting in 1 minute...
 to cancel.
 
 "
-#shutdown -r +1
+##shutdown -r +1
  
