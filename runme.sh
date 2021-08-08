@@ -299,10 +299,15 @@ rm -rf c* p* /root/.cpan* /gbooking *.sh std* original* noh* ins* /tmp/*
 
 echo "
 
-rebooting in 1 minute... use shutdown -c    to cancel.
-rebooting in 1 minute... use shutdown -c    to cancel.
-rebooting in 1 minute... use shutdown -c    to cancel.
+rebooting in 1 minute... 
+rebooting in 1 minute... 
+rebooting in 1 minute... 
+rebooting in 1 minute... 
+
+     use shutdown -c    
+
+to cancel.
 
 "
-shutdown -r +1
+#shutdown -r +1
  

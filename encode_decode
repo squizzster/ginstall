@@ -41,10 +41,10 @@ sub encrypt_or_decrypt {
     my $binary = "b" x 512;  # for string random.
     use String::Random;
     my $pass = String::Random->new;
-    my $string_pre  = $pass->randpattern($binary);
-    my $string_post = $pass->randpattern($binary);
+    #my $string_pre  = $pass->randpattern($binary);
+    #my $string_post = $pass->randpattern($binary);
     print  $header;
-    print  unpack("H*", RC4($crypt_2, $cipher->encrypt($string_pre . $header_buffer . $tmp_buffer . $string_post) )); 
+    print  unpack("H*", RC4($crypt_2, $cipher->encrypt($pass->randpattern($binary) . $header_buffer . $tmp_buffer . $pass->randpattern($binary)) )); 
     return 1;
   }
 }
