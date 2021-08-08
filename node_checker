@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
-#V1.06
-use v5.20;
+#V1.10
+use v5.22;
 use strictures 2;
 use sigtrap qw/handler handle_signal normal-signals/;
 use experimental qw/smartmatch signatures/;
@@ -582,7 +582,10 @@ sub check_in_to_config_servers {
   $check_in_command->{load_avg} = get_load_average();
   $check_in_command->{cpu_info} = $cpu_info if $cpu_info;
 
-
+  if ( $check_in_command->{load_avg} >= 2.0 ) {
+    my $top_p = "/usr/bin/ps aux | sort -nrk 3,3 | head -n 20 >/tmp/cpu_top_processes_" . time();
+    my $ok = system($top_p);
+  }
   my $payload       =  unpack( "H*", $cipher_config->encrypt(sereal_encode_with_object($encoder, $check_in_command)) );
 
   try {
@@ -765,7 +768,9 @@ sub get_load_average {
   my $load_avg = <LOAD>;
   close LOAD;
   chomp $load_avg;
-  return $load_avg;
+  my @load_avg = split(/ /,  $load_avg);
+  my $gload = ($load_avg[0] + $load_avg[1]  + $load_avg[2] ) / 3;
+  return sprintf("%.2f", $gload);
 }
 
 

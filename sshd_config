@@ -1,36 +1,37 @@
 ##### gbooking v1.0 ######
+
 HostKey /etc/ssh/ssh_host_ed25519_key
 
 SyslogFacility AUTHPRIV
 LogLevel INFO
 
-StrictModes yes
+StrictModes      yes
+LoginGraceTime    15
+MaxAuthTries       1
+MaxSessions       10
 
-LoginGraceTime 4 
-PermitRootLogin yes
-MaxAuthTries 1
-MaxSessions 10
+PermitRootLogin                 yes
 PermitRootLogin without-password
-PubkeyAuthentication yes
+PermitEmptyPasswords            no
+
+ChallengeResponseAuthentication yes
+PubkeyAuthentication            yes
+PubkeyAcceptedKeyTypes          ssh-ed25519
+PasswordAuthentication          no
+KerberosAuthentication          no
+GSSAPIAuthentication            no
+UsePAM                          yes
+
 AuthorizedKeysFile .ssh/authorized_keys
-PasswordAuthentication no
-PermitEmptyPasswords no
-TCPKeepAlive yes
-#Banner none
+AuthenticationMethods publickey,keyboard-interactive
 
-ChallengeResponseAuthentication no
-KerberosAuthentication no
-GSSAPIAuthentication no
-PubkeyAcceptedKeyTypes ssh-ed25519-cert-v01@openssh.com,ssh-ed25519
+TCPKeepAlive           yes
+PrintMotd              yes
 
-UsePAM no
-
-X11Forwarding no
-PrintMotd no
-
-PermitUserEnvironment no
-AllowAgentForwarding no
-AllowTcpForwarding no
-PermitTunnel no
+X11Forwarding          no
+PermitUserEnvironment  no
+AllowAgentForwarding   no
+AllowTcpForwarding     no
+PermitTunnel           no
 
 Subsystem sftp  /usr/libexec/openssh/sftp-server

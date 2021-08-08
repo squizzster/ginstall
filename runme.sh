@@ -74,7 +74,8 @@ dnf -y config-manager --set-enabled powertools
 curl -L https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
 dnf -y install firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options
 dnf -y install MariaDB-server MariaDB-client mod_ssl redis mysql-devel memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs
-dnf -y install cpan traceroute telnet sysbench libpng-devel zlib-devel 
+dnf -y install cpan traceroute telnet sysbench libpng-devel zlib-devel  libgcrypt libgcrypt-devel compat-libpthread-nonshared bzip2 google-authenticator qrencode-libs
+ 
 
 ## Postgres not used at moment
 ##dnf -y install postgresql perl-pgsql_perl5 pg_top perl-DBD-Pg postgresql-contrib java-11-openjdk 
@@ -224,7 +225,7 @@ LogLevel INFO
 
 StrictModes yes
 
-LoginGraceTime 5
+LoginGraceTime 15
 PermitRootLogin yes
 MaxAuthTries 1
 MaxSessions 5
@@ -236,15 +237,15 @@ PermitEmptyPasswords no
 TCPKeepAlive yes
 #Banner none
 
-ChallengeResponseAuthentication no
+ChallengeResponseAuthentication yes
 KerberosAuthentication no
 GSSAPIAuthentication no
-PubkeyAcceptedKeyTypes ssh-ed25519-cert-v01@openssh.com,ssh-ed25519
+PubkeyAcceptedKeyTypes ssh-ed25519
 
-UsePAM no
+UsePAM yes
 
 X11Forwarding no
-PrintMotd no
+PrintMotd yes
 
 PermitUserEnvironment no
 AllowAgentForwarding no
