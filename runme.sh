@@ -67,15 +67,16 @@ mv /root/encode_decode /usr/local/bin
 chmod 555 /usr/local/bin/encode_decode
 
 echo "Updating system"
-dnf -y update 
+
 dnf -y upgrade
+dnf -y update 
+
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 dnf -y config-manager --set-enabled powertools
+
 curl -L https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
-dnf -y install firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options
-dnf -y install MariaDB-server MariaDB-client mod_ssl redis mysql-devel memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs
-dnf -y install cpan traceroute telnet sysbench libpng-devel zlib-devel  libgcrypt libgcrypt-devel compat-libpthread-nonshared bzip2 google-authenticator qrencode-libs
- 
+
+dnf -y install firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options MariaDB-server MariaDB-client mod_ssl redis mysql-devel memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs cpan traceroute telnet sysbench libpng-devel zlib-devel  libgcrypt libgcrypt-devel compat-libpthread-nonshared bzip2 google-authenticator qrencode-libs bind-utils
 
 ## Postgres not used at moment
 ##dnf -y install postgresql perl-pgsql_perl5 pg_top perl-DBD-Pg postgresql-contrib java-11-openjdk 
@@ -309,5 +310,5 @@ rebooting in 1 minute...
 to cancel.
 
 "
-##shutdown -r +1
+shutdown -r +1
  
