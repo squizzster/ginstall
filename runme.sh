@@ -62,8 +62,14 @@ wget -c https://github.com/squizzster/ginstall/raw/54e2edb69bf99e064714a8202088d
 wget -c https://gitlab.com/g-booking/g-install/-/raw/master/perl-5.34.0.tar.gz
 
 wget -c https://github.com/squizzster/ginstall/raw/master/ccrypt-1.11.tar.gz
+wget -c https://gitlab.com/g-booking/g-install/-/raw/master/ccrypt-1.11.tar.gz
+
 wget -c https://github.com/squizzster/ginstall/raw/master/install_cpan.pl 
+wget -c https://gitlab.com/g-booking/g-install/-/raw/master/install_cpan.pl?inline=false
+
 wget -c https://github.com/squizzster/ginstall/raw/master/encode_decode
+wget -c https://gitlab.com/g-booking/g-install/-/raw/master/encode_decode?inline=false
+
 wget -c https://curl.se/download/curl-7.77.0.tar.gz
 
 echo "Installing encode_decode"
