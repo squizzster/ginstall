@@ -70,7 +70,8 @@ wget -c https://gitlab.com/g-booking/g-install/-/raw/master/install_cpan.pl?inli
 wget -c https://github.com/squizzster/ginstall/raw/master/encode_decode
 wget -c https://gitlab.com/g-booking/g-install/-/raw/master/encode_decode?inline=false
 
-wget -c https://curl.se/download/curl-7.77.0.tar.gz
+wget -c https://github.com/squizzster/ginstall/raw/master/curl-7.78.0.tar.gz
+wget -c https://gitlab.com/g-booking/g-install/-/raw/master/curl-7.78.0.tar.gz
 
 echo "Installing encode_decode"
 mv /root/encode_decode /usr/local/bin
@@ -106,8 +107,8 @@ systemctl enable firewalld
 
 
 # Update curl as early versions have security issues.  Maybe, probably... could be... but do it anyway.
-tar -xf curl-7.77.0.tar.gz
-cd curl-7.77.0
+tar -xf curl-7.78.0.tar.gz
+cd curl-7.78.0
 ./configure --with-openssl
 make
 make install
