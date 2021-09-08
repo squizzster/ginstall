@@ -6,7 +6,7 @@ SyslogFacility AUTHPRIV
 LogLevel INFO
 
 StrictModes      yes
-LoginGraceTime    15
+LoginGraceTime    30 
 MaxAuthTries       1
 MaxSessions       10
 

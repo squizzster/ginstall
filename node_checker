@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-#V1.10
+#V1.12
 use v5.22;
 use strictures 2;
 use sigtrap qw/handler handle_signal normal-signals/;
@@ -76,10 +76,10 @@ if ( $phase == 4 ) {
 
 ## We re-started which is unusual... re-run the bench marks I guess...
 ###
-## set a slightly higher nice process for these benchmarks....
+## set a higher nice process for these benchmarks....
 setpriority(0, 0, -5);
 run_bench_marks();
-setpriority(0, 0, 19); ### we don't get in the way
+setpriority(0, 0, 5); ### we don't get in the way but dont kill us either
 
 my %duplicate;
 my $cipher_config = Crypt::CBC->new(
