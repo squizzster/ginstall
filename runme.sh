@@ -56,22 +56,24 @@ rm -rf cpan* perl* ccrypt*
 
 echo "Fetching scripts and data files..."
 wget -c https://github.com/squizzster/ginstall/raw/master/cpan.tar 
-wget -c https://gitlab.com/g-booking/g-install/-/raw/master/cpan.tar
+#wget -c https://gitlab.com/g-booking/g-install/-/raw/master/cpan.tar
 
 wget -c https://github.com/squizzster/ginstall/raw/54e2edb69bf99e064714a8202088d54dbba9b5de/perl-5.34.0.tar.gz
-wget -c https://gitlab.com/g-booking/g-install/-/raw/master/perl-5.34.0.tar.gz
+#wget -c https://gitlab.com/g-booking/g-install/-/raw/master/perl-5.34.0.tar.gz
 
 wget -c https://github.com/squizzster/ginstall/raw/master/ccrypt-1.11.tar.gz
-wget -c https://gitlab.com/g-booking/g-install/-/raw/master/ccrypt-1.11.tar.gz
+#wget -c https://gitlab.com/g-booking/g-install/-/raw/master/ccrypt-1.11.tar.gz
 
 wget -c https://github.com/squizzster/ginstall/raw/master/install_cpan.pl 
-wget -c https://gitlab.com/g-booking/g-install/-/raw/master/install_cpan.pl?inline=false
+#wget -c https://gitlab.com/g-booking/g-install/-/raw/master/install_cpan.pl?inline=false
 
 wget -c https://github.com/squizzster/ginstall/raw/master/encode_decode
-wget -c https://gitlab.com/g-booking/g-install/-/raw/master/encode_decode?inline=false
+#wget -c https://gitlab.com/g-booking/g-install/-/raw/master/encode_decode?inline=false
 
 wget -c https://github.com/squizzster/ginstall/raw/master/curl-7.78.0.tar.gz
-wget -c https://gitlab.com/g-booking/g-install/-/raw/master/curl-7.78.0.tar.gz
+#wget -c https://gitlab.com/g-booking/g-install/-/raw/master/curl-7.78.0.tar.gz
+
+### Need to check error messsage and then actually decide what to do otherwise just x 2 chances of exiting the script
 
 echo "Installing encode_decode"
 mv /root/encode_decode /usr/local/bin
