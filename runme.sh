@@ -324,4 +324,9 @@ to cancel.
 
 "
 shutdown -r +1
- 
+sleep 58
+>/var/log/messages
+>/var/log/secure
+>/var/log/firewalld
+
+sleep 20 
