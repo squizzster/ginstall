@@ -10,7 +10,7 @@ catch() {
     echo "Error $1 occurred on $2"
   fi
 }
-dnf -y install wget chrony firewalld tar bind-utils.x86_64
+dnf -y install wget chrony firewalld tar bind-utils.x86_64 curl
 EIP=`dig emergency.g-booking.com +short`
 echo -n '<?xml version="1.0" encoding="utf-8"?>
 <zone target="DROP">
@@ -70,10 +70,10 @@ wget -c https://github.com/squizzster/ginstall/raw/master/install_cpan.pl
 wget -c https://github.com/squizzster/ginstall/raw/master/encode_decode
 #wget -c https://gitlab.com/g-booking/g-install/-/raw/master/encode_decode?inline=false
 
-wget -c https://github.com/squizzster/ginstall/raw/master/curl-7.78.0.tar.gz
+#wget -c https://github.com/squizzster/ginstall/raw/master/curl-7.78.0.tar.gz
 #wget -c https://gitlab.com/g-booking/g-install/-/raw/master/curl-7.78.0.tar.gz
 
-### Need to check error messsage and then actually decide what to do otherwise just x 2 chances of exiting the script
+### Need to check error messsage and then actually decide what to do otherwise just x 2 chances of exiting the script but we dont have one of those
 
 echo "Installing encode_decode"
 mv /root/encode_decode /usr/local/bin
@@ -89,7 +89,7 @@ dnf -y config-manager --set-enabled powertools
 
 curl -L https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
 
-dnf -y install firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options MariaDB-server MariaDB-client mod_ssl redis mysql-devel memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs cpan traceroute telnet sysbench libpng-devel zlib-devel  libgcrypt libgcrypt-devel compat-libpthread-nonshared bzip2 google-authenticator qrencode-libs bind-utils
+dnf -y install firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options MariaDB-server MariaDB-client mod_ssl redis mysql-devel memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs cpan traceroute telnet sysbench libpng-devel zlib-devel  libgcrypt libgcrypt-devel compat-libpthread-nonshared bzip2 google-authenticator qrencode-libs bind-utils ncdu
 
 ## Postgres not used at moment
 ##dnf -y install postgresql perl-pgsql_perl5 pg_top perl-DBD-Pg postgresql-contrib java-11-openjdk 
@@ -108,14 +108,14 @@ systemctl disable mariadb
 systemctl enable firewalld 
 
 
-# Update curl as early versions have security issues.  Maybe, probably... could be... but do it anyway.
-tar -xf curl-7.78.0.tar.gz
-cd curl-7.78.0
-./configure --with-openssl
-make
-make install
-cd ..
-ln -f /usr/local/bin/curl /usr/bin/curl
+## Update curl as early versions have security issues.  Maybe, probably... could be... but do it anyway.
+#tar -xf curl-7.78.0.tar.gz
+#cd curl-7.78.0
+#./configure --with-openssl
+#make
+#make install
+#cd ..
+#ln -f /usr/local/bin/curl /usr/bin/curl
 
 
 gzip -fd ccrypt-1.11.tar.gz
