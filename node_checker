@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-#V1.12
+#V1.17
 use v5.22;
 use strictures 2;
 use sigtrap qw/handler handle_signal normal-signals/;
@@ -41,6 +41,17 @@ my $jnl       = Linux::Systemd::Journal::Write->new;
 my $phase = get_phase();
 g_message( "g-Booking Node Checker V$node_checker_version started. Phase [$phase].");
 
+my $up_time_secs = get_up_time();
+if ( $up_time_secs < 500 ) {
+  g_message( "g-Booking Node Checker V$node_checker_version sleeping 90 seconds as up_time is [$up_time_secs] seconds.");
+  sd_notify(starting => 1, status => 'g-Booking Node Checker V$node_checker_version. Sleeping.');
+  sleep 60;
+  sd_notify(starting => 1, status => 'g-Booking Node Checker V$node_checker_version. Sleeping.');
+  sleep 30;
+  sd_notify(starting => 1, status => 'g-Booking Node Checker V$node_checker_version. Continuing after sleep.');
+}
+
+
 my $emergency_ip_no = add_emergency_ip();
 start_reload_firewall();
 my $host_name       = get_my_hostname ();
@@ -79,6 +90,10 @@ if ( $phase == 4 ) {
 ## set a higher nice process for these benchmarks....
 setpriority(0, 0, -5);
 run_bench_marks();
+  
+g_message( "g-Booking Node Checker V$node_checker_version. Bench-marks complete. ");
+sd_notify(starting => 1, status => 'g-Booking Node Checker V$node_checker_version. Bench-marks complete..');
+
 setpriority(0, 0, 5); ### we don't get in the way but dont kill us either
 
 my %duplicate;
@@ -775,6 +790,17 @@ sub get_load_average {
 
 
 
+sub get_up_time {
+  open(UP, "/proc/uptime") or return;
+  my $up_time = <UP>;
+  close UP;
+  chomp $up_time;
+  my @up_time = split(/ /,  $up_time);
+  return int($up_time[0]);
+}
+
+
+
 sub get_cpu_info {
   my $cpu_info;
   open(my $fh, "/proc/cpuinfo") or return;
@@ -870,13 +896,17 @@ sub run_bench_marks {
   my $dsk_read   = "0.00";
   my $dsk_write  = "0.00";
 
+
+  g_message( "g-Booking Node Checker V$node_checker_version. Running CPU bench_marks");
   sd_notify(starting => 1, status => 'Running CPU bench_marks...');
   my $test_cpu   = `/usr/bin/sysbench cpu    run`;
 
   sd_notify(starting => 1, status => 'Running MEMORY bench_marks...');
+  g_message( "g-Booking Node Checker V$node_checker_version. Running MEMORY bench_marks");
   my $test_mem   = `/usr/bin/sysbench memory run`;
 
 
+  g_message( "g-Booking Node Checker V$node_checker_version. Running DISK bench_marks");
   sd_notify(starting => 1, status => 'Preparing DISK bench_marks...');
   mkdir "/g_test"; 
   chdir "/g_test";
