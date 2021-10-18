@@ -89,7 +89,7 @@ dnf -y config-manager --set-enabled powertools
 
 curl -L https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
 
-dnf -y install firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options MariaDB-server MariaDB-client mod_ssl redis mysql-devel memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs cpan traceroute telnet sysbench libpng-devel zlib-devel  libgcrypt libgcrypt-devel compat-libpthread-nonshared bzip2 google-authenticator qrencode-libs bind-utils ncdu
+dnf -y install firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options MariaDB-server MariaDB-client mod_ssl redis mysql-devel memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs cpan traceroute telnet sysbench libpng-devel zlib-devel  libgcrypt libgcrypt-devel compat-libpthread-nonshared bzip2 google-authenticator qrencode-libs bind-utils ncdu nodejs libsecret-devel
 
 ## Postgres not used at moment
 ##dnf -y install postgresql perl-pgsql_perl5 pg_top perl-DBD-Pg postgresql-contrib java-11-openjdk 
@@ -143,8 +143,6 @@ cd       /gbooking/g-booking-server/install/cpan
 
 tar -xf  /root/cpan.tar
 rm -f    /root/cpan.tar
-
-curl -L https://github.com/squizzster/ginstall/raw/master/install_cpan.pl | perl 
 
 cd /root
 
@@ -301,7 +299,10 @@ cd /root
 
 #cd /root
 
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash
 
+cd       /gbooking/g-booking-server/install/cpan
+curl -L https://github.com/squizzster/ginstall/raw/master/install_cpan.pl | perl 
 
 
 
