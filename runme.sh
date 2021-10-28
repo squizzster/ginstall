@@ -309,6 +309,7 @@ cd /root
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash
 
 cd       /gbooking/g-booking-server/install/cpan
+cpanm *.gz
 curl -L https://github.com/squizzster/ginstall/raw/master/install_cpan.pl | perl 
 
 
