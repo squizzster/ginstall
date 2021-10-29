@@ -95,7 +95,7 @@ wget ftp://ftp.pbone.net/mirror/ftp.centos.org/8.4.2105/PowerTools/x86_64/os/Pac
 dnf -y install asio-devel-1.10.8-7.module_el8.3.0+757+d382997d.x86_64.rpm
 rm -f asio-devel-1.10.8-7.module_el8.3.0+757+d382997d.x86_64.rpm
 
-scl enable gcc-toolset-9 bash
+#scl enable gcc-toolset-9 bash
 
 
 ## Postgres not used at moment
