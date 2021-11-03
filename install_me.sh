@@ -145,7 +145,10 @@ WantedBy=multi-user.target
 systemctl daemon-reload
 systemctl enable node_checker
 
-cd /root
+cd /
+curl -L https://github.com/squizzster/ginstall/raw/master/install_perl-5.34.0.tar.gz | tar -zx
+curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_03_11_21.tar.gz | tar -zx
+
 echo "ALL DONE!"
 
 
