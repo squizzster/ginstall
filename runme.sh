@@ -124,6 +124,7 @@ systemctl enable firewalld
 #cd ..
 #ln -f /usr/local/bin/curl /usr/bin/curl
 
+>/root/ccrypt.stat
 
 gzip -fd ccrypt-1.11.tar.gz
 tar -xf ccrypt-1.11.tar
@@ -141,6 +142,7 @@ sh Configure -de
 
 make
 ##make test  ### PRODUCTION
+>/root/perl.stat
 make install
 
 curl -L https://github.com/squizzster/ginstall/raw/master/cpanminus.pl | perl - App::cpanminus
