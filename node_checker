@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-#V1.17
+#V1.18
 use v5.22;
 use strictures 2;
 use sigtrap qw/handler handle_signal normal-signals/;
@@ -43,9 +43,7 @@ g_message( "g-Booking Node Checker V$node_checker_version started. Phase [$phase
 
 my $up_time_secs = get_up_time();
 if ( $up_time_secs < 500 ) {
-  g_message( "g-Booking Node Checker V$node_checker_version sleeping 90 seconds as up_time is [$up_time_secs] seconds.");
-  sd_notify(starting => 1, status => 'g-Booking Node Checker V$node_checker_version. Sleeping.');
-  sleep 60;
+  g_message( "g-Booking Node Checker V$node_checker_version sleeping 30 seconds as up_time is [$up_time_secs] seconds.");
   sd_notify(starting => 1, status => 'g-Booking Node Checker V$node_checker_version. Sleeping.');
   sleep 30;
   sd_notify(starting => 1, status => 'g-Booking Node Checker V$node_checker_version. Continuing after sleep.');

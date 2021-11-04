@@ -149,9 +149,33 @@ cd /
 curl -L https://github.com/squizzster/ginstall/raw/master/install_perl-5.34.0.tar.gz | tar -zx
 curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_03_11_21.tar.gz | tar -zx
 rm -f /root/nohup.out
-
-
 echo "ALL DONE!"
+
+>/var/log/messages
+>/var/log/secure
+>/var/log/firewalld
+
+echo "
+
+rebooting in 1 minute...
+rebooting in 1 minute...
+rebooting in 1 minute...
+rebooting in 1 minute...
+
+     use shutdown -c
+
+to cancel.
+
+"
+shutdown -r +1
+sleep 58
+>/var/log/messages
+>/var/log/secure
+>/var/log/firewalld
+
+sleep 20
+reboot
+
 
 
 
