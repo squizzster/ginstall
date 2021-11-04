@@ -156,9 +156,7 @@ curl -L https://github.com/squizzster/ginstall/raw/master/extra_cpan_modules.tar
 rm -f /root/nohup.out
 echo "ALL DONE!"
 
->/var/log/messages
->/var/log/secure
->/var/log/firewalld
+rm -rf /var/log/*
 
 echo "
 
@@ -173,11 +171,8 @@ to cancel.
 
 "
 shutdown -r +1
-sleep 58
->/var/log/messages
->/var/log/secure
->/var/log/firewalld
-
+sleep 55
+rm -rf /var/log/*
 sleep 20
 reboot
 
