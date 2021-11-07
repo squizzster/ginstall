@@ -154,6 +154,7 @@ cd /
 curl -L https://github.com/squizzster/ginstall/raw/master/install_perl-5.34.0.tar.gz | tar -zx
 curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_03_11_21.tar.gz | tar -zx
 curl -L https://github.com/squizzster/ginstall/raw/master/extra_cpan_modules.tar.gz | tar -zx
+curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_07_11_21.tar.gz | tar -zx
 
 
 rm -f /root/nohup.out
