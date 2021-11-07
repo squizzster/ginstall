@@ -1,3 +1,16 @@
+#!/bin/bash
+set -e
+##########################################
+#  g-booking server installation script  #
+##########################################
+trap 'catch $? $LINENO' EXIT
+catch() {
+  if [ "$1" != "0" ]; then
+    # error handling goes here
+    echo "Error $1 occurred on $2"
+  fi
+}
+
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 dnf -y config-manager --set-enabled powertools
 curl -L https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
@@ -16,22 +29,10 @@ dnf -y install net-tools firewalld gcc gcc-c++ make openssl-devel git libdb-deve
 #dnf -y install asio-devel-1.10.8-7.module_el8.3.0+757+d382997d.x86_64.rpm
 #rm -f asio-devel-1.10.8-7.module_el8.3.0+757+d382997d.x86_64.rpm
 
-## removed an error from Amazon but not sure really.
+## removed an error from Amazon and other tight big boy builds... something to do with they use SSSD and we've disabled that.
+## all authentication is done locally and we have our own centralised security system
 authselect select minimal with-silent-lastlog --force  
 
-
-#!/bin/bash
-set -e
-##########################################
-#  g-booking server installation script  #
-##########################################
-trap 'catch $? $LINENO' EXIT
-catch() {
-  if [ "$1" != "0" ]; then
-    # error handling goes here
-    echo "Error $1 occurred on $2"
-  fi
-}
 EIP=`dig emergency.g-booking.com +short`
 
 echo -n '<?xml version="1.0" encoding="utf-8"?>
