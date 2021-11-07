@@ -50,6 +50,7 @@ echo -n '"/>
 
 systemctl enable firewalld
 systemctl start firewalld
+systemctl restart firewalld
 
 cd /root
 BASEDIR=$(pwd)
