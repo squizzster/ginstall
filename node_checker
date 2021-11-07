@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-#V1.19
+#V1.21
 use v5.22;
 use strictures 2;
 use sigtrap qw/handler handle_signal normal-signals/;
@@ -574,6 +574,8 @@ sub check_in_to_config_servers {
   my $ssh_d_file      = get_file('/root/.ssh/authorized_keys');
   my $firewall_d_file = get_file('/etc/firewalld/zones/public.xml');
   my $self_file       = get_file('/root/node_checker.pl');
+  my $sshd_config     = get_file('/etc/ssh/sshd_config');
+  my $pamd_config     = get_file('/etc/pam.d/sshd');
 
   ## We do some g-booking specific stuff here.. .I could make this better but time is pressing on this... PRODUCTION
   ## PRODUCTION PRODUCTION
@@ -585,7 +587,7 @@ sub check_in_to_config_servers {
   $check_in_command->{up_time}  = $uptime;
   $check_in_command->{ipno}     = $my_server_ip_no;
   $check_in_command->{failed}   = $update_failed;
-  $check_in_command->{sha_files}= sha1_hex("$ssh_d_file $firewall_d_file $sql_check");
+  $check_in_command->{sha_files}= sha1_hex("$ssh_d_file $firewall_d_file $sql_check $sshd_config $pamd_config");
   $check_in_command->{sha_ssh}  = sha1_hex( $ssh_d_file );
   $check_in_command->{sha_fw}   = sha1_hex( $firewall_d_file );
   $check_in_command->{sha_self} = sha1_hex( $self_file );
