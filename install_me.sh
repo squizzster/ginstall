@@ -88,8 +88,10 @@ systemctl enable mariadb
 systemctl start mariadb
 echo "Adding mysql";
 nohup mysql_upgrade &
-mysql_secure_installation
 sleep 20;
+
+echo 'RFJPUCBEQVRBQkFTRSBJRiBFWElTVFMgdGVzdDsKREVMRVRFIEZST00gbXlzcWwudXNlciBXSEVSRSBVc2VyPSdyb290JyBBTkQgSG9zdCBOT1QgSU4gKCdsb2NhbGhvc3QnLCAnMTI3LjAuMC4xJywgJzo6MScpOwpERUxFVEUgRlJPTSBteXNxbC51c2VyIFdIRVJFIFVzZXI9Jyc7CkRFTEVURSBGUk9NIG15c3FsLmRiIFdIRVJFIERiPSd0ZXN0JyBPUiBEYj0ndGVzdFxfJSc7CkZMVVNIIFBSSVZJTEVHRVM7Cgo=' | base64 -d | mysql
+
 echo "Adding zones";
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
 systemctl stop mariadb
