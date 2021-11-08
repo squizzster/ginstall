@@ -2,6 +2,7 @@
 
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 dnf -y config-manager --set-enabled powertools
+dnf -y remove polkit sssd-client  sssd-common  sssd-kcm   sssd-nfs-idmap mysql mysql-common mysql-devel
 
 set -e
 ##########################################
@@ -18,7 +19,6 @@ catch() {
 ####curl -L https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
 
 ## don't think we need this and it takes up resource
-dnf -y remove polkit sssd-client  sssd-common  sssd-kcm   sssd-nfs-idmap
 dnf -y upgrade
 dnf -y update 
 
