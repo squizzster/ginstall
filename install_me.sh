@@ -198,8 +198,8 @@ curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_07_1
 rm -f `find /var/log -type f`
 rm -f /root/nohup.out
 
-systemctl stop mariadb >>/root/install.log 2>>/root/install.err
-systemctl disable mariadb >>/root/install.log 2>>/root/install.err
+#systemctl stop mariadb >>/root/install.log 2>>/root/install.err
+#systemctl disable mariadb >>/root/install.log 2>>/root/install.err
 
 echo "ALL DONE!"
 
