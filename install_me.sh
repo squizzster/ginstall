@@ -100,7 +100,7 @@ cd /root
 echo "Downloading gDrive Down Tool"
 #### Our Gdrive DOWNLOAD tool
 curl -L https://github.com/squizzster/ginstall/raw/master/gdown.pl >/usr/local/bin/gdown.pl 2>>/root/install.err
-chmod 555 /usr/local/bin/gdown.pl >>/root/install.log 2>>/root/install.err
+chmod 555 /usr/local/bin/gdown.pl 
 
 echo "Getting latest MariaDB"
 /usr/local/bin/gdown.pl 'https://drive.google.com/file/d/167ku817WTPSRmmWsn7T9GSzqeaKdibjq/view?usp=sharing' /root/mariadb-10.6.5-rhel-8-x86_64-rpms.tar
