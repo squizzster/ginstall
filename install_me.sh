@@ -14,8 +14,6 @@ dnf -y remove polkit sssd-client  sssd-common  sssd-kcm   sssd-nfs-idmap mysql m
 echo "Installing Boost Build"
 dnf -y install boost-build >>/root/install.log 2>>/root/install.err
 
-
-
 ### stuff here cannot fail....
 set -e
 ##########################################
