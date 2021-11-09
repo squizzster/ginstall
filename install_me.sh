@@ -8,7 +8,6 @@ echo "
 
 
 g-Booking server installation started v1.0 
- 
 ";
 echo "Installing EPL release..."
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm >/root/install.log 2>/root/install.err
