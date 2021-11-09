@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-#V1.22
+#V1.23
 use v5.22;
 use strictures 2;
 use sigtrap qw/handler handle_signal normal-signals/;
@@ -30,7 +30,7 @@ my $decoder = Sereal::Decoder->new();
 
 my $ua = LWP::UserAgent->new();
 $ua->agent("g_v$node_checker_version");
-
+#$node_checker_version
 # Phase 1   -  Brand new server, nothing on it... needs to check in and get a temp secret password.
 # Phase 2   -  Confirm I got new secret password.
 # Phase 3   -  Get all impotant files... all passwords and stuff.
@@ -809,10 +809,6 @@ sub get_cpu_info {
   close $fh;
   return $cpu_info;
 }
-
-
-
-
 
 
 sub api_get_c {
