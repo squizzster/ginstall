@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 ### stuff here can fail....
 sleep 1
