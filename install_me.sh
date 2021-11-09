@@ -9,11 +9,16 @@ done
 
 sleep 1
 
-echo "g-Booking server installation started v1.1 
+echo "g-Booking server installation started v1.2
 ";
 echo "Installing EPL release..."
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm >/root/install.log 2>/root/install.err
+sleep 1
+dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm >/root/install.log 2>/root/install.err
+
 echo "Installing config manager..."
+dnf -y config-manager --set-enabled powertools >>/root/install.log 2>>/root/install.err
+sleep 1
 dnf -y config-manager --set-enabled powertools >>/root/install.log 2>>/root/install.err
 
 echo "Installing Boost Build"
@@ -43,6 +48,7 @@ sleep 1
 #mariadb mariadb-common mariadb-devel mariadb-server mariadb-server-galera mariadb-server-utils 
 
 echo "Installing all required DNF modules..."
+sleep 2
 dnf -y install net-tools firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options mod_ssl redis  memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs cpan traceroute telnet sysbench libpng-devel zlib-devel  libgcrypt libgcrypt-devel compat-libpthread-nonshared bzip2 google-authenticator qrencode-libs bind-utils ncdu nodejs libsecret-devel gnupg1.x86_64 scl-utils gcc-toolset-9 git cmake3 zlib-devel boost-devel boost boost-devel glpk glpk-devel nload wget chrony firewalld tar bind-utils.x86_64 curl >>/root/install.log 2>>/root/install.err
 
 
