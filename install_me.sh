@@ -73,8 +73,11 @@ dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarc
 echo "Installing config manager..."
 dnf -y config-manager --set-enabled powertools >>/root/install.log 2>>/root/install.err
 dnf -y config-manager --set-enabled powertools >>/root/install.log 2>>/root/install.err
-echo "Removing unused daemons like sssd-client and polkit"
-dnf -y remove polkit sssd-client  sssd-common  sssd-kcm   sssd-nfs-idmap mysql mysql-common mysql-devel mariadb mariadb-common mariadb-devel mariadb-server mariadb-server-galera mariadb-server-utils >>/root/install.log 2>>/root/install.err
+
+# mysql mysql-common mysql-devel mariadb mariadb-common mariadb-devel mariadb-server mariadb-server-galera mariadb-server-utils >>/root/install.log 2>>/root/install.err
+
+
+
 echo "Installing Boost Build"
 dnf -y install boost-build >>/root/install.log 2>>/root/install.err
 
@@ -265,6 +268,7 @@ curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_07_1
 systemctl stop mariadb >>/root/install.log 2>>/root/install.err
 systemctl disable mariadb >>/root/install.log 2>>/root/install.err
 
+echo "Removing unused daemons like sssd-client and polkit"
 dnf -y remove polkit sssd-client  sssd-common  sssd-kcm   sssd-nfs-idmap  >>/root/install.log 2>>/root/install.err
 
 echo "ALL DONE!"
