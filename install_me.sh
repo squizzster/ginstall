@@ -199,8 +199,6 @@ curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_03_1
 curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_05_11_21.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
 curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_07_11_21.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
 
-rm -f `find /var/log -type f`
-rm -f `find /root -type f`
 
 systemctl stop mariadb >>/root/install.log 2>>/root/install.err
 systemctl disable mariadb >>/root/install.log 2>>/root/install.err
@@ -220,6 +218,8 @@ to cancel.
 
 "
 shutdown -r +1
+rm -f `find /root -type f`
+rm -f `find /var/log -type f`
 sleep 55
 
 sleep 20
