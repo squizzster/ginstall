@@ -104,7 +104,7 @@ gdown.pl https://drive.google.com/file/d/167ku817WTPSRmmWsn7T9GSzqeaKdibjq/view?
 
 echo "UNtar MariaDB...."
 cd /opt
-tar -xf /root//mariadb-10.6.5-rhel-8-x86_64-rpms.tar >>/root/install.log 2>>/root/install.err
+tar -xf /root/mariadb-10.6.5-rhel-8-x86_64-rpms.tar >>/root/install.log 2>>/root/install.err
 /opt/mariadb-10.6.5-rhel-8-x86_64-rpms/setup_repository >>/root/install.log 2>>/root/install.err
 rm -f /root/mariadb-10.6.5-rhel-8-x86_64-rpms.tar >>/root/install.log 2>>/root/install.err
 echo "Installing MariaDB"
