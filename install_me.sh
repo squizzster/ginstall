@@ -265,6 +265,8 @@ curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_07_1
 systemctl stop mariadb >>/root/install.log 2>>/root/install.err
 systemctl disable mariadb >>/root/install.log 2>>/root/install.err
 
+dnf -y remove polkit sssd-client  sssd-common  sssd-kcm   sssd-nfs-idmap  >>/root/install.log 2>>/root/install.err
+
 echo "ALL DONE!"
 
 echo "
@@ -280,7 +282,7 @@ to cancel.
 
 "
 shutdown -r +1
-rm -f `find /root -type f`
+#rm -f `find /root -type f`
 rm -f `find /var/log -type f`
 sleep 55
 
