@@ -13,14 +13,8 @@ echo "g-Booking server installation started v1.1
 ";
 echo "Installing EPL release..."
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm >/root/install.log 2>/root/install.err
-dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm >/root/install.log 2>/root/install.err
 echo "Installing config manager..."
 dnf -y config-manager --set-enabled powertools >>/root/install.log 2>>/root/install.err
-dnf -y config-manager --set-enabled powertools >>/root/install.log 2>>/root/install.err
-
-# mysql mysql-common mysql-devel mariadb mariadb-common mariadb-devel mariadb-server mariadb-server-galera mariadb-server-utils >>/root/install.log 2>>/root/install.err
-
-
 
 echo "Installing Boost Build"
 dnf -y install boost-build >>/root/install.log 2>>/root/install.err
