@@ -574,7 +574,7 @@ sub check_in_to_config_servers {
   my $sql_check       = get_file('/root/.server.cnf');
   my $ssh_d_file      = get_file('/root/.ssh/authorized_keys');
   my $firewall_d_file = get_file('/etc/firewalld/zones/public.xml');
-  my $self_file       = get_file('/root/node_checker.pl');
+  my $self_file       = get_file('/usr/local/bin/node_checker.pl');
   my $sshd_config     = get_file('/etc/ssh/sshd_config');
   my $pamd_config     = get_file('/etc/pam.d/sshd');
 
