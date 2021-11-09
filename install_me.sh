@@ -3,7 +3,7 @@
 ### stuff here can fail....
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 dnf -y config-manager --set-enabled powertools
-dnf -y remove polkit sssd-client  sssd-common  sssd-kcm   sssd-nfs-idmap mysql mysql-common mysql-devel
+dnf -y remove polkit sssd-client  sssd-common  sssd-kcm   sssd-nfs-idmap mysql mysql-common mysql-devel mariadb mariadb-common mariadb-devel mariadb-server mariadb-server-galera mariadb-server-utils
 dnf -y install boost-build
 
 
