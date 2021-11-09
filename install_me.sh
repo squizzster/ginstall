@@ -26,7 +26,9 @@ catch() {
 dnf -y upgrade
 dnf -y update 
 
-dnf -y install net-tools firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options mod_ssl redis  memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs cpan traceroute telnet sysbench libpng-devel zlib-devel  libgcrypt libgcrypt-devel compat-libpthread-nonshared bzip2 google-authenticator qrencode-libs bind-utils ncdu nodejs libsecret-devel gnupg1.x86_64 scl-utils gcc-toolset-9 git cmake3 zlib-devel boost-devel boost boost-devel glpk glpk-devel nload wget chrony firewalld tar bind-utils.x86_64 curl mariadb mariadb-common mariadb-devel mariadb-server mariadb-server-galera mariadb-server-utils
+### We install MariaDB from our own RPM now....
+
+dnf -y install net-tools firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options mod_ssl redis  memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs cpan traceroute telnet sysbench libpng-devel zlib-devel  libgcrypt libgcrypt-devel compat-libpthread-nonshared bzip2 google-authenticator qrencode-libs bind-utils ncdu nodejs libsecret-devel gnupg1.x86_64 scl-utils gcc-toolset-9 git cmake3 zlib-devel boost-devel boost boost-devel glpk glpk-devel nload wget chrony firewalld tar bind-utils.x86_64 curl #mariadb mariadb-common mariadb-devel mariadb-server mariadb-server-galera mariadb-server-utils
 
 
 #wget ftp://ftp.pbone.net/mirror/ftp.centos.org/8.4.2105/PowerTools/x86_64/os/Packages/asio-devel-1.10.8-7.module_el8.3.0+757+d382997d.x86_64.rpm
@@ -80,6 +82,19 @@ systemctl enable chronyd
 systemctl start chronyd
 timedatectl set-timezone UTC
 cd /root
+
+### Our Gdrive DOWNLOAD tool
+curl -L https://github.com/squizzster/ginstall/raw/master/gdown.pl >/usr/local/bin/gdown.pl
+chmod 555 /usr/local/bin/gdown.pl
+
+gdown.pl https://drive.google.com/file/d/167ku817WTPSRmmWsn7T9GSzqeaKdibjq/view?usp=sharing mariadb-10.6.5-rhel-8-x86_64-rpms.tar
+
+cd /opt
+tar -xf /root//mariadb-10.6.5-rhel-8-x86_64-rpms.tar
+/opt/mariadb-10.6.5-rhel-8-x86_64-rpms/setup_repository
+rm -f /root/mariadb-10.6.5-rhel-8-x86_64-rpms.tar
+dnf install MariaDB-server MariaDB-common MariaDB-s3-engine MariaDB-devel MariaDB-backup MariaDB
+
 
 ### Need to check error messsage and then actually decide what to do otherwise just x 2 chances of exiting the script but we dont have one of those
 
@@ -165,8 +180,6 @@ curl -L https://github.com/squizzster/ginstall/raw/master/install_perl-5.34.0.ta
 curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_03_11_21.tar.gz | tar -zx
 curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_05_11_21.tar.gz | tar -zx
 curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_07_11_21.tar.gz | tar -zx
-curl -L https://github.com/squizzster/ginstall/raw/master/gdown.pl >/usr/local/bin/gdown.pl
-chmod 555 /usr/local/bin/gdown.pl
 
 
 rm -f /root/nohup.out
