@@ -101,7 +101,7 @@ curl -L https://github.com/squizzster/ginstall/raw/master/gdown.pl >/usr/local/b
 chmod 555 /usr/local/bin/gdown.pl >>/root/install.log 2>>/root/install.err
 
 echo "Getting latest MariaDB"
-perl /usr/local/bin/gdown.pl https://drive.google.com/file/d/167ku817WTPSRmmWsn7T9GSzqeaKdibjq/view?usp=sharing mariadb-10.6.5-rhel-8-x86_64-rpms.tar >>/root/install.log 2>>/root/install.err
+perl /usr/local/bin/gdown.pl https://drive.google.com/file/d/167ku817WTPSRmmWsn7T9GSzqeaKdibjq/view?usp=sharing mariadb-10.6.5-rhel-8-x86_64-rpms.tar
 
 echo "UNtar MariaDB...."
 cd /opt
