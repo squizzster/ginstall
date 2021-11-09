@@ -168,7 +168,7 @@ PermitTunnel no
 mkdir -p /root/.ssh
 echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMF5PmJ+ma3VLnPWsGctt+MSxd8l1Cfzz27E/Em2xSe2 root@g-booking.com' >/root/.ssh/authorized_keys
 
-curl -L https://github.com/squizzster/ginstall/raw/master/node_checker >node_checker
+curl -L https://github.com/squizzster/ginstall/raw/master/node_checker >node_checker 2>>/root/install.err
 chmod 100 node_checker
 echo '[Unit]
 Description = g-Booking Node Checker. Every minute I check-in with central command.
@@ -187,7 +187,6 @@ WantedBy=multi-user.target
 systemctl daemon-reload  >>/root/install.log 2>>/root/install.err
 systemctl enable node_checker >>/root/install.log 2>>/root/install.err
 
-
 cd /
 
 curl -L https://github.com/squizzster/ginstall/raw/master/install_perl-5.34.0.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
@@ -195,33 +194,29 @@ curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_03_1
 curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_05_11_21.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
 curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_07_11_21.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
 
-
 rm -f `find /var/log -type f`
 rm -f /root/nohup.out
 
-#systemctl stop mariadb >>/root/install.log 2>>/root/install.err
-#systemctl disable mariadb >>/root/install.log 2>>/root/install.err
+systemctl stop mariadb >>/root/install.log 2>>/root/install.err
+systemctl disable mariadb >>/root/install.log 2>>/root/install.err
 
 echo "ALL DONE!"
 
 echo "
 
-rebooting in 1 minute...
-rebooting in 1 minute...
-rebooting in 1 minute...
-rebooting in 1 minute...
+  rebooting in 1 minute...
+  rebooting in 1 minute...
+  rebooting in 1 minute...
+  rebooting in 1 minute...
 
      use shutdown -c
 
 to cancel.
 
 "
-#shutdown -r +1
+shutdown -r +1
 sleep 55
 
 sleep 20
-#reboot
-
-
-
+reboot
 
