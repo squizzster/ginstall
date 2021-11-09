@@ -28,7 +28,7 @@ catch() {
 ####curl -L https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
 
 ## don't think we need this and it takes up resource
-echo "Perfomring an upgrade of everything..."
+echo "Performing an upgrade of everything..."
 dnf -y upgrade >>/root/install.log 2>>/root/install.err
 dnf -y update >>/root/install.log 2>>/root/install.err
 
