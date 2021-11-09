@@ -78,15 +78,19 @@ echo "g-Booking server installation started
 [ -d "/gbooking" ] && echo "g-booking directory exists...I am aborting so you can have a rethink." || echo "Thunderbirds are GO!"
 [ -d "/gbooking" ] && exit
 
+echo "Enabling chronyd"
 systemctl enable chronyd
+echo "Staring chronyd"
 systemctl start chronyd
+echo "Setting timezone to UTC"
 timedatectl set-timezone UTC
 cd /root
-
+echo "Downloading gDrive Down Tool"
 ### Our Gdrive DOWNLOAD tool
 curl -L https://github.com/squizzster/ginstall/raw/master/gdown.pl >/usr/local/bin/gdown.pl
 chmod 555 /usr/local/bin/gdown.pl
 
+echo "Getting latest MariaDB"
 gdown.pl https://drive.google.com/file/d/167ku817WTPSRmmWsn7T9GSzqeaKdibjq/view?usp=sharing mariadb-10.6.5-rhel-8-x86_64-rpms.tar
 
 cd /opt
