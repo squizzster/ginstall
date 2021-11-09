@@ -11,9 +11,11 @@ sleep 1
 
 echo "g-Booking server installation started v1.2
 ";
+sleep 10
+
 echo "Installing EPL release..."
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm >/root/install.log 2>/root/install.err
-sleep 1
+sleep 3
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm >/root/install.log 2>/root/install.err
 
 echo "Installing config manager..."
