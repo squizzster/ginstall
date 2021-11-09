@@ -2,6 +2,9 @@
 
 ### stuff here can fail....
 sleep 1
+echo "g-Booking server installation started
+ 
+";
 echo "Installing EPL release..."
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm >/root/install.log 2>/root/install.err
 echo "Installing config manager..."
@@ -81,8 +84,6 @@ fi
 
 [ -f /etc/redhat-release ] && echo "" || exit 
 
-echo "g-Booking server installation started
-";
 
 [ -d "/gbooking" ] && echo "g-booking directory exists...I am aborting so you can have a rethink." || echo "Thunderbirds are GO!"
 [ -d "/gbooking" ] && exit
