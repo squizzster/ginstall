@@ -168,10 +168,7 @@ curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_07_1
 
 rm -f /root/nohup.out
 echo "ALL DONE!"
-
-rm -f /var/log/*
-rm -f /var/log/*/*
-rm -f /var/log/*/*/*
+rm -f `find /var/log -type f`
 
 echo "
 
@@ -187,9 +184,8 @@ to cancel.
 "
 shutdown -r +1
 sleep 55
-rm -f /var/log/*
-rm -f /var/log/*/*
-rm -f /var/log/*/*/*
+rm -f `find /var/log -type f`
+
 sleep 20
 reboot
 
