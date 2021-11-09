@@ -91,12 +91,14 @@ fi
 [ -d "/gbooking" ] && echo "g-booking directory exists...I am aborting so you can have a rethink." || echo "Thunderbirds are GO!"
 [ -d "/gbooking" ] && exit
 
-echo "Enabling chronyd"
-systemctl enable chronyd >>/root/install.log 2>>/root/install.err
-echo "Staring chronyd"
-systemctl start chronyd >>/root/install.log 2>>/root/install.err
 echo "Setting timezone to UTC"
 timedatectl set-timezone UTC >>/root/install.log 2>>/root/install.err
+
+echo "Enabling chronyd"
+systemctl enable chronyd >>/root/install.log 2>>/root/install.err
+
+echo "Staring chronyd"
+systemctl start chronyd >>/root/install.log 2>>/root/install.err
 cd /root
 
 echo "Downloading gDrive Down Tool"
