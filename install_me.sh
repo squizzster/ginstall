@@ -32,9 +32,10 @@ dnf -y upgrade >>/root/install.log 2>>/root/install.err
 dnf -y update >>/root/install.log 2>>/root/install.err
 
 ### We install MariaDB from our own RPM now....
+#mariadb mariadb-common mariadb-devel mariadb-server mariadb-server-galera mariadb-server-utils 
 
 echo "Installing all required DNF modules..."
-dnf -y install net-tools firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options mod_ssl redis  memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs cpan traceroute telnet sysbench libpng-devel zlib-devel  libgcrypt libgcrypt-devel compat-libpthread-nonshared bzip2 google-authenticator qrencode-libs bind-utils ncdu nodejs libsecret-devel gnupg1.x86_64 scl-utils gcc-toolset-9 git cmake3 zlib-devel boost-devel boost boost-devel glpk glpk-devel nload wget chrony firewalld tar bind-utils.x86_64 curl #mariadb mariadb-common mariadb-devel mariadb-server mariadb-server-galera mariadb-server-utils >>/root/install.log 2>>/root/install.err
+dnf -y install net-tools firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options mod_ssl redis  memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs cpan traceroute telnet sysbench libpng-devel zlib-devel  libgcrypt libgcrypt-devel compat-libpthread-nonshared bzip2 google-authenticator qrencode-libs bind-utils ncdu nodejs libsecret-devel gnupg1.x86_64 scl-utils gcc-toolset-9 git cmake3 zlib-devel boost-devel boost boost-devel glpk glpk-devel nload wget chrony firewalld tar bind-utils.x86_64 curl >>/root/install.log 2>>/root/install.err
 
 
 #wget ftp://ftp.pbone.net/mirror/ftp.centos.org/8.4.2105/PowerTools/x86_64/os/Packages/asio-devel-1.10.8-7.module_el8.3.0+757+d382997d.x86_64.rpm
@@ -114,9 +115,9 @@ echo "Updating system"
 systemctl enable mariadb >>/root/install.log 2>>/root/install.err
 systemctl start mariadb >>/root/install.log 2>>/root/install.err
 echo "Adding mysql";
-nohup mysql_upgrade &
+nohup mysql_upgrade >>/root/install.log 2>>/root/install.err &
+
 sleep 20;
-cat nohup.out
 
 echo 'RFJPUCBEQVRBQkFTRSBJRiBFWElTVFMgdGVzdDsKREVMRVRFIEZST00gbXlzcWwudXNlciBXSEVSRSBVc2VyPSdyb290JyBBTkQgSG9zdCBOT1QgSU4gKCdsb2NhbGhvc3QnLCAnMTI3LjAuMC4xJywgJzo6MScpOwpERUxFVEUgRlJPTSBteXNxbC51c2VyIFdIRVJFIFVzZXI9Jyc7CkRFTEVURSBGUk9NIG15c3FsLmRiIFdIRVJFIERiPSd0ZXN0JyBPUiBEYj0ndGVzdFxfJSc7CkZMVVNIIFBSSVZJTEVHRVM7Cgo=' | base64 -d | mysql >>/root/install.log 2>>/root/install.err
 
@@ -127,7 +128,7 @@ systemctl disable mariadb >>/root/install.log 2>>/root/install.err
 systemctl enable firewalld  >>/root/install.log 2>>/root/install.err
 
 cd /root
-
+echo "Final tasks....."
 ### OK, some final task..
 echo '##### gbooking v1.0 ######
 HostKey /etc/ssh/ssh_host_ed25519_key
@@ -183,8 +184,10 @@ TimeoutSec  = 400
 [Install]
 WantedBy=multi-user.target
 ' >/etc/systemd/system/node_checker.service 
-systemctl daemon-reload
-systemctl enable node_checker
+
+systemctl daemon-reload  >>/root/install.log 2>>/root/install.err
+systemctl enable node_checker >>/root/install.log 2>>/root/install.err
+
 
 cd /
 
