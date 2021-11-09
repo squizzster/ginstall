@@ -97,8 +97,7 @@ cd /opt
 tar -xf /root//mariadb-10.6.5-rhel-8-x86_64-rpms.tar
 /opt/mariadb-10.6.5-rhel-8-x86_64-rpms/setup_repository
 rm -f /root/mariadb-10.6.5-rhel-8-x86_64-rpms.tar
-dnf install MariaDB-server MariaDB-common MariaDB-s3-engine MariaDB-devel MariaDB-backup MariaDB
-
+dnf -y install MariaDB-server MariaDB-common MariaDB-s3-engine MariaDB-devel MariaDB-backup MariaDB
 
 ### Need to check error messsage and then actually decide what to do otherwise just x 2 chances of exiting the script but we dont have one of those
 
