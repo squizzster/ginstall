@@ -1,71 +1,15 @@
 #!/bin/sh
 
 ### stuff here can fail....
+for (( c=1; c<=500; c++ ))
+do  
+   echo "
+"
+done
+
 sleep 1
-echo "
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-g-Booking server installation started v1.1 
+echo "g-Booking server installation started v1.1 
 ";
 echo "Installing EPL release..."
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm >/root/install.log 2>/root/install.err
@@ -286,7 +230,7 @@ to cancel.
 
 "
 shutdown -r +1
-#rm -f `find /root -type f`
+rm -f /root/gdown*
 rm -f `find /var/log -type f`
 sleep 55
 
