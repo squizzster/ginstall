@@ -875,7 +875,7 @@ sub add_to_firewall {
 }
 
 sub get_node_checker_version {
-  my $file_name = '/root/node_checker';
+  my $file_name = '/usr/local/bin/node_checker';
   my $version = "1.0";
   if ( -e $file_name ) {
     open(my $fh, '<', $file_name);
