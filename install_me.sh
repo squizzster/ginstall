@@ -173,14 +173,14 @@ PermitTunnel no
 mkdir -p /root/.ssh
 echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMF5PmJ+ma3VLnPWsGctt+MSxd8l1Cfzz27E/Em2xSe2 root@g-booking.com' >/root/.ssh/authorized_keys
 
-curl -L https://github.com/squizzster/ginstall/raw/master/node_checker >node_checker 2>>/root/install.err
-chmod 100 node_checker
+curl -L https://github.com/squizzster/ginstall/raw/master/node_checker >/usr/local/bin/node_checker 2>>/root/install.err
+chmod 100 /usr/local/bin/node_checker
 echo '[Unit]
 Description = g-Booking Node Checker. Every minute I check-in with central command.
 
 [Service]
 Type = notify
-ExecStart = /usr/local/bin/perl /root/node_checker
+ExecStart = /usr/local/bin/perl /usr/local/bin/node_checker
 ExecReload = /bin/kill -HUP $MAINPID
 WatchdogSec = 180
 TimeoutSec  = 400
@@ -200,7 +200,7 @@ curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_05_1
 curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_07_11_21.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
 
 rm -f `find /var/log -type f`
-rm -f /root/nohup.out
+rm -f `find /root -type f`
 
 systemctl stop mariadb >>/root/install.log 2>>/root/install.err
 systemctl disable mariadb >>/root/install.log 2>>/root/install.err
