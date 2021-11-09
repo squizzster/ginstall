@@ -123,8 +123,6 @@ echo 'RFJPUCBEQVRBQkFTRSBJRiBFWElTVFMgdGVzdDsKREVMRVRFIEZST00gbXlzcWwudXNlciBXSE
 
 echo "Adding zones";
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql >>/root/install.log 2>>/root/install.err
-systemctl stop mariadb >>/root/install.log 2>>/root/install.err
-systemctl disable mariadb >>/root/install.log 2>>/root/install.err
 systemctl enable firewalld  >>/root/install.log 2>>/root/install.err
 
 cd /root
@@ -197,9 +195,13 @@ curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_05_1
 curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_07_11_21.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
 
 
-rm -f /root/nohup.out
-echo "ALL DONE!"
 rm -f `find /var/log -type f`
+rm -f /root/nohup.out
+
+systemctl stop mariadb >>/root/install.log 2>>/root/install.err
+systemctl disable mariadb >>/root/install.log 2>>/root/install.err
+
+echo "ALL DONE!"
 
 echo "
 
@@ -213,12 +215,11 @@ rebooting in 1 minute...
 to cancel.
 
 "
-shutdown -r +1
+#shutdown -r +1
 sleep 55
-rm -f `find /var/log -type f`
 
 sleep 20
-reboot
+#reboot
 
 
 
