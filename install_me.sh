@@ -1,17 +1,77 @@
 #!/bin/sh
 
-
 ### stuff here can fail....
 sleep 1
 echo "
 
 
 
-g-Booking server installation started v1.0 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+g-Booking server installation started v1.1 
 ";
 echo "Installing EPL release..."
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm >/root/install.log 2>/root/install.err
+dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm >/root/install.log 2>/root/install.err
 echo "Installing config manager..."
+dnf -y config-manager --set-enabled powertools >>/root/install.log 2>>/root/install.err
 dnf -y config-manager --set-enabled powertools >>/root/install.log 2>>/root/install.err
 echo "Removing unused daemons like sssd-client and polkit"
 dnf -y remove polkit sssd-client  sssd-common  sssd-kcm   sssd-nfs-idmap mysql mysql-common mysql-devel mariadb mariadb-common mariadb-devel mariadb-server mariadb-server-galera mariadb-server-utils >>/root/install.log 2>>/root/install.err
@@ -35,9 +95,9 @@ catch() {
 
 ## don't think we need this and it takes up resource
 echo "Performing an upgrade of everything..."
+sleep 1
 dnf -y upgrade >>/root/install.log 2>>/root/install.err
-dnf -y update >>/root/install.log 2>>/root/install.err
-
+sleep 1
 ### We install MariaDB from our own RPM now....
 #mariadb mariadb-common mariadb-devel mariadb-server mariadb-server-galera mariadb-server-utils 
 
