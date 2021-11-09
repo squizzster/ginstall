@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-#V1.25
+#V1.26
 use v5.22;
 use strictures 2;
 use sigtrap qw/handler handle_signal normal-signals/;
