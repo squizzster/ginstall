@@ -97,7 +97,7 @@ sub execute_command() {
         die "\nDownloading interrupted by user\n\n";
     } elsif ( $OUTPUT == 0 && length($CONTINUE)>0 ) { # do a clean exit with $FILENAME provided
         unlink $TEMP;
-        die "\nDownloading complete\n\n";
+        exit;
     }
     return 1;
 }
