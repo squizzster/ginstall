@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-#V1.21
+#V1.22
 use v5.22;
 use strictures 2;
 use sigtrap qw/handler handle_signal normal-signals/;
@@ -483,8 +483,9 @@ sub get_file {
   my $file_name = $_[0];
   my $file_contents;
   if ( -e $file_name ) {
+    my $file_len = -s $file_name;
     open(my $fh, '<', $file_name);
-    my $read  = read ($fh, $file_contents, 262144000);
+    my $read  = read ($fh, $file_contents, $file_len);
     close $fh;
     chomp $file_contents;
     return $file_contents;
