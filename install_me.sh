@@ -1,9 +1,13 @@
 #!/bin/bash
 
 ### stuff here can fail....
+echo "Installing EPL release..."
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm >/root/install.log 2>/root/install.err
+echo "Installing config manager..."
 dnf -y config-manager --set-enabled powertools >>/root/install.log 2>>/root/install.err
+echo "Removing unused daemons like sssd-client and polkit"
 dnf -y remove polkit sssd-client  sssd-common  sssd-kcm   sssd-nfs-idmap mysql mysql-common mysql-devel mariadb mariadb-common mariadb-devel mariadb-server mariadb-server-galera mariadb-server-utils >>/root/install.log 2>>/root/install.err
+echo "Installing Boost Build"
 dnf -y install boost-build >>/root/install.log 2>>/root/install.err
 
 
