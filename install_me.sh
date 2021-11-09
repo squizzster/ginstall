@@ -2,9 +2,11 @@
 
 ### stuff here can fail....
 sleep 1
-echo "g-Booking server installation started
+echo "
 
 
+
+g-Booking server installation started v1.0 
  
 ";
 echo "Installing EPL release..."
