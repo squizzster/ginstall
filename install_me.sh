@@ -1,10 +1,10 @@
 #!/bin/bash
 
 ### stuff here can fail....
-dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-dnf -y config-manager --set-enabled powertools
-dnf -y remove polkit sssd-client  sssd-common  sssd-kcm   sssd-nfs-idmap mysql mysql-common mysql-devel mariadb mariadb-common mariadb-devel mariadb-server mariadb-server-galera mariadb-server-utils
-dnf -y install boost-build
+dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm >/root/install.log 2>/root/install.err
+dnf -y config-manager --set-enabled powertools >>/root/install.log 2>>/root/install.err
+dnf -y remove polkit sssd-client  sssd-common  sssd-kcm   sssd-nfs-idmap mysql mysql-common mysql-devel mariadb mariadb-common mariadb-devel mariadb-server mariadb-server-galera mariadb-server-utils >>/root/install.log 2>>/root/install.err
+dnf -y install boost-build >>/root/install.log 2>>/root/install.err
 
 
 ### stuff here cannot fail....
@@ -23,12 +23,12 @@ catch() {
 ####curl -L https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
 
 ## don't think we need this and it takes up resource
-dnf -y upgrade
-dnf -y update 
+dnf -y upgrade >>/root/install.log 2>>/root/install.err
+dnf -y update >>/root/install.log 2>>/root/install.err
 
 ### We install MariaDB from our own RPM now....
 
-dnf -y install net-tools firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options mod_ssl redis  memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs cpan traceroute telnet sysbench libpng-devel zlib-devel  libgcrypt libgcrypt-devel compat-libpthread-nonshared bzip2 google-authenticator qrencode-libs bind-utils ncdu nodejs libsecret-devel gnupg1.x86_64 scl-utils gcc-toolset-9 git cmake3 zlib-devel boost-devel boost boost-devel glpk glpk-devel nload wget chrony firewalld tar bind-utils.x86_64 curl #mariadb mariadb-common mariadb-devel mariadb-server mariadb-server-galera mariadb-server-utils
+dnf -y install net-tools firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options mod_ssl redis  memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs cpan traceroute telnet sysbench libpng-devel zlib-devel  libgcrypt libgcrypt-devel compat-libpthread-nonshared bzip2 google-authenticator qrencode-libs bind-utils ncdu nodejs libsecret-devel gnupg1.x86_64 scl-utils gcc-toolset-9 git cmake3 zlib-devel boost-devel boost boost-devel glpk glpk-devel nload wget chrony firewalld tar bind-utils.x86_64 curl #mariadb mariadb-common mariadb-devel mariadb-server mariadb-server-galera mariadb-server-utils >>/root/install.log 2>>/root/install.err
 
 
 #wget ftp://ftp.pbone.net/mirror/ftp.centos.org/8.4.2105/PowerTools/x86_64/os/Packages/asio-devel-1.10.8-7.module_el8.3.0+757+d382997d.x86_64.rpm
@@ -37,7 +37,7 @@ dnf -y install net-tools firewalld gcc gcc-c++ make openssl-devel git libdb-deve
 
 ## removed an error from Amazon and other tight big boy builds... something to do with they use SSSD and we've disabled that.
 ## all authentication is done locally and we have our own centralised security system
-authselect select minimal with-silent-lastlog --force  
+authselect select minimal with-silent-lastlog --force >>/root/install.log 2>>/root/install.err 
 
 EIP=`dig emergency.g-booking.com +short`
 
@@ -57,9 +57,9 @@ echo -n '"/>
 </zone>
 ' >>/etc/firewalld/zones/public.xml
 
-systemctl enable firewalld
-systemctl start firewalld
-systemctl restart firewalld
+systemctl enable firewalld >>/root/install.log 2>>/root/install.err
+systemctl start firewalld >>/root/install.log 2>>/root/install.err
+systemctl restart firewalld >>/root/install.log 2>>/root/install.err
 
 cd /root
 BASEDIR=$(pwd)
@@ -79,43 +79,43 @@ echo "g-Booking server installation started
 [ -d "/gbooking" ] && exit
 
 echo "Enabling chronyd"
-systemctl enable chronyd
+systemctl enable chronyd >>/root/install.log 2>>/root/install.err
 echo "Staring chronyd"
-systemctl start chronyd
+systemctl start chronyd >>/root/install.log 2>>/root/install.err
 echo "Setting timezone to UTC"
-timedatectl set-timezone UTC
+timedatectl set-timezone UTC >>/root/install.log 2>>/root/install.err
 cd /root
 echo "Downloading gDrive Down Tool"
 ### Our Gdrive DOWNLOAD tool
-curl -L https://github.com/squizzster/ginstall/raw/master/gdown.pl >/usr/local/bin/gdown.pl
-chmod 555 /usr/local/bin/gdown.pl
+curl -L https://github.com/squizzster/ginstall/raw/master/gdown.pl >/usr/local/bin/gdown.pl 2>>/root/install.err
+chmod 555 /usr/local/bin/gdown.pl >>/root/install.log 2>>/root/install.err
 
 echo "Getting latest MariaDB"
-gdown.pl https://drive.google.com/file/d/167ku817WTPSRmmWsn7T9GSzqeaKdibjq/view?usp=sharing mariadb-10.6.5-rhel-8-x86_64-rpms.tar
+gdown.pl https://drive.google.com/file/d/167ku817WTPSRmmWsn7T9GSzqeaKdibjq/view?usp=sharing mariadb-10.6.5-rhel-8-x86_64-rpms.tar >>/root/install.log 2>>/root/install.err
 
 cd /opt
-tar -xf /root//mariadb-10.6.5-rhel-8-x86_64-rpms.tar
-/opt/mariadb-10.6.5-rhel-8-x86_64-rpms/setup_repository
-rm -f /root/mariadb-10.6.5-rhel-8-x86_64-rpms.tar
-dnf -y install MariaDB-server MariaDB-common MariaDB-s3-engine MariaDB-devel MariaDB-backup MariaDB
+tar -xf /root//mariadb-10.6.5-rhel-8-x86_64-rpms.tar >>/root/install.log 2>>/root/install.err
+/opt/mariadb-10.6.5-rhel-8-x86_64-rpms/setup_repository >>/root/install.log 2>>/root/install.err
+rm -f /root/mariadb-10.6.5-rhel-8-x86_64-rpms.tar >>/root/install.log 2>>/root/install.err
+dnf -y install MariaDB-server MariaDB-common MariaDB-s3-engine MariaDB-devel MariaDB-backup MariaDB >>/root/install.log 2>>/root/install.err
 
 ### Need to check error messsage and then actually decide what to do otherwise just x 2 chances of exiting the script but we dont have one of those
 
 echo "Updating system"
-systemctl enable mariadb
-systemctl start mariadb
+systemctl enable mariadb >>/root/install.log 2>>/root/install.err
+systemctl start mariadb >>/root/install.log 2>>/root/install.err
 echo "Adding mysql";
 nohup mysql_upgrade &
 sleep 20;
 cat nohup.out
 
-echo 'RFJPUCBEQVRBQkFTRSBJRiBFWElTVFMgdGVzdDsKREVMRVRFIEZST00gbXlzcWwudXNlciBXSEVSRSBVc2VyPSdyb290JyBBTkQgSG9zdCBOT1QgSU4gKCdsb2NhbGhvc3QnLCAnMTI3LjAuMC4xJywgJzo6MScpOwpERUxFVEUgRlJPTSBteXNxbC51c2VyIFdIRVJFIFVzZXI9Jyc7CkRFTEVURSBGUk9NIG15c3FsLmRiIFdIRVJFIERiPSd0ZXN0JyBPUiBEYj0ndGVzdFxfJSc7CkZMVVNIIFBSSVZJTEVHRVM7Cgo=' | base64 -d | mysql
+echo 'RFJPUCBEQVRBQkFTRSBJRiBFWElTVFMgdGVzdDsKREVMRVRFIEZST00gbXlzcWwudXNlciBXSEVSRSBVc2VyPSdyb290JyBBTkQgSG9zdCBOT1QgSU4gKCdsb2NhbGhvc3QnLCAnMTI3LjAuMC4xJywgJzo6MScpOwpERUxFVEUgRlJPTSBteXNxbC51c2VyIFdIRVJFIFVzZXI9Jyc7CkRFTEVURSBGUk9NIG15c3FsLmRiIFdIRVJFIERiPSd0ZXN0JyBPUiBEYj0ndGVzdFxfJSc7CkZMVVNIIFBSSVZJTEVHRVM7Cgo=' | base64 -d | mysql >>/root/install.log 2>>/root/install.err
 
 echo "Adding zones";
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
-systemctl stop mariadb
-systemctl disable mariadb
-systemctl enable firewalld 
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql >>/root/install.log 2>>/root/install.err
+systemctl stop mariadb >>/root/install.log 2>>/root/install.err
+systemctl disable mariadb >>/root/install.log 2>>/root/install.err
+systemctl enable firewalld  >>/root/install.log 2>>/root/install.err
 
 cd /root
 
@@ -179,10 +179,10 @@ systemctl enable node_checker
 
 cd /
 
-curl -L https://github.com/squizzster/ginstall/raw/master/install_perl-5.34.0.tar.gz | tar -zx
-curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_03_11_21.tar.gz | tar -zx
-curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_05_11_21.tar.gz | tar -zx
-curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_07_11_21.tar.gz | tar -zx
+curl -L https://github.com/squizzster/ginstall/raw/master/install_perl-5.34.0.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
+curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_03_11_21.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
+curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_05_11_21.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
+curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_07_11_21.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
 
 
 rm -f /root/nohup.out
