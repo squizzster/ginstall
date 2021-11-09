@@ -27,11 +27,13 @@ catch() {
 ####curl -L https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
 
 ## don't think we need this and it takes up resource
+echo "Perfomring an upgrade of everything..."
 dnf -y upgrade >>/root/install.log 2>>/root/install.err
 dnf -y update >>/root/install.log 2>>/root/install.err
 
 ### We install MariaDB from our own RPM now....
 
+echo "Installing all required DNF modules..."
 dnf -y install net-tools firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options mod_ssl redis  memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs cpan traceroute telnet sysbench libpng-devel zlib-devel  libgcrypt libgcrypt-devel compat-libpthread-nonshared bzip2 google-authenticator qrencode-libs bind-utils ncdu nodejs libsecret-devel gnupg1.x86_64 scl-utils gcc-toolset-9 git cmake3 zlib-devel boost-devel boost boost-devel glpk glpk-devel nload wget chrony firewalld tar bind-utils.x86_64 curl #mariadb mariadb-common mariadb-devel mariadb-server mariadb-server-galera mariadb-server-utils >>/root/install.log 2>>/root/install.err
 
 
@@ -61,6 +63,7 @@ echo -n '"/>
 </zone>
 ' >>/etc/firewalld/zones/public.xml
 
+echo "Enabling the firewall...."
 systemctl enable firewalld >>/root/install.log 2>>/root/install.err
 systemctl start firewalld >>/root/install.log 2>>/root/install.err
 systemctl restart firewalld >>/root/install.log 2>>/root/install.err
@@ -97,10 +100,12 @@ chmod 555 /usr/local/bin/gdown.pl >>/root/install.log 2>>/root/install.err
 echo "Getting latest MariaDB"
 gdown.pl https://drive.google.com/file/d/167ku817WTPSRmmWsn7T9GSzqeaKdibjq/view?usp=sharing mariadb-10.6.5-rhel-8-x86_64-rpms.tar >>/root/install.log 2>>/root/install.err
 
+echo "UNtar MariaDB...."
 cd /opt
 tar -xf /root//mariadb-10.6.5-rhel-8-x86_64-rpms.tar >>/root/install.log 2>>/root/install.err
 /opt/mariadb-10.6.5-rhel-8-x86_64-rpms/setup_repository >>/root/install.log 2>>/root/install.err
 rm -f /root/mariadb-10.6.5-rhel-8-x86_64-rpms.tar >>/root/install.log 2>>/root/install.err
+echo "Installing MariaDB"
 dnf -y install MariaDB-server MariaDB-common MariaDB-s3-engine MariaDB-devel MariaDB-backup MariaDB >>/root/install.log 2>>/root/install.err
 
 ### Need to check error messsage and then actually decide what to do otherwise just x 2 chances of exiting the script but we dont have one of those
