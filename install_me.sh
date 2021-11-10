@@ -1,5 +1,14 @@
 #!/bin/sh
 
+
+
+### NEW CPAN:
+#    GIS::Distance::Fast
+#    GIS::Distance
+#    cpanm GIS::Distance::Fast  GIS::Distance
+
+
+
 ### stuff here can fail....
 for (( c=1; c<=500; c++ ))
 do  
@@ -118,10 +127,10 @@ echo "Downloading gDrive Down Tool"
 curl -L https://github.com/squizzster/ginstall/raw/master/gdown.pl >/usr/local/bin/gdown.pl 2>>/root/install.err
 chmod 555 /usr/local/bin/gdown.pl 
 
-echo "Getting latest MariaDB"
+echo "Download MariaDB"
 /usr/local/bin/gdown.pl 'https://drive.google.com/file/d/167ku817WTPSRmmWsn7T9GSzqeaKdibjq/view?usp=sharing' /root/mariadb-10.6.5-rhel-8-x86_64-rpms.tar
 
-echo "UNtar MariaDB...."
+echo "Install MariaDB...."
 cd /opt
 tar -xf /root/mariadb-10.6.5-rhel-8-x86_64-rpms.tar >>/root/install.log 2>>/root/install.err
 /opt/mariadb-10.6.5-rhel-8-x86_64-rpms/setup_repository >>/root/install.log 2>>/root/install.err
@@ -234,11 +243,9 @@ echo "
 to cancel.
 
 "
-shutdown -r +1
+
 rm -f /root/gdown*
 rm -f `find /var/log -type f`
-sleep 55
 
-sleep 20
-reboot
+shutdown -r +1
 
