@@ -23,6 +23,9 @@ dnf -y config-manager --set-enabled powertools >>/root/install.log 2>>/root/inst
 sleep 1
 dnf -y config-manager --set-enabled powertools >>/root/install.log 2>>/root/install.err
 
+subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms >>/root/install.log 2>>/root/install.err
+
+
 echo "Installing Boost Build"
 dnf -y install boost-build >>/root/install.log 2>>/root/install.err
 
