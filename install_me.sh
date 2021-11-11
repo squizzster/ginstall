@@ -20,7 +20,7 @@ done
 [ -d "/gbooking" ] && echo "g-booking directory exists...I am aborting so you can have a rethink." || echo "Thunderbirds are GO!"
 [ -d "/gbooking" ] && exit
 sleep 1
-echo "Thunderbird 1,  starting lift off...
+echo "Thunderbird 5,  starting lift off...
 ";
 sleep 1
 
@@ -121,7 +121,7 @@ cd /root
 
 echo "Download MariaDB"
 rm -f mariadb-10.*.tar
-curl -s -L https://agitated-ramanujan-4baf2c.netlify.app/mariadb-10.6.5-rhel-8-x86_64-rpms.tar >mariadb-10.6.5-rhel-8-x86_64-rpms.tar 2>>/root/install.err
+wget --read-timeout=30 --tries=10  --progress=bar https://agitated-ramanujan-4baf2c.netlify.app/mariadb-10.6.5-rhel-8-x86_64-rpms.tar 2>>/root/install.err
 
 #####wget https://storage.googleapis.com/g-booking-install/mariadb-10.6.5-rhel-8-x86_64-rpms.tar  >>/root/install.log 2>>/root/install.err
 
