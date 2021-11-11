@@ -1,12 +1,12 @@
 #!/bin/sh
 
-
-
 ### NEW CPAN:
 #    GIS::Distance::Fast
 #    GIS::Distance
 #    cpanm GIS::Distance::Fast  GIS::Distance
 
+echo "One moment...."
+sleep 1
 
 
 ### stuff here can fail....
@@ -16,9 +16,8 @@ do
 "
 done
 
-sleep 1
 
-echo "g-Booking server installation started v1.2
+echo "g-Booking server installation started v1.3
 ";
 sleep 10
 
@@ -122,13 +121,13 @@ echo "Staring chronyd"
 systemctl start chronyd >>/root/install.log 2>>/root/install.err
 cd /root
 
-echo "Downloading gDrive Down Tool"
+#echo "Downloading gDrive Down Tool"
 #### Our Gdrive DOWNLOAD tool
-curl -L https://github.com/squizzster/ginstall/raw/master/gdown.pl >/usr/local/bin/gdown.pl 2>>/root/install.err
-chmod 555 /usr/local/bin/gdown.pl 
+#curl -L https://github.com/squizzster/ginstall/raw/master/gdown.pl >/usr/local/bin/gdown.pl 2>>/root/install.err
+#chmod 555 /usr/local/bin/gdown.pl 
 
 echo "Download MariaDB"
-/usr/local/bin/gdown.pl 'https://drive.google.com/file/d/167ku817WTPSRmmWsn7T9GSzqeaKdibjq/view?usp=sharing' /root/mariadb-10.6.5-rhel-8-x86_64-rpms.tar
+wget -c https://storage.googleapis.com/g-booking-install/mariadb-10.6.5-rhel-8-x86_64-rpms.tar
 
 echo "Install MariaDB...."
 cd /opt
