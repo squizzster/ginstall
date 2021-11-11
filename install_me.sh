@@ -212,6 +212,27 @@ TimeoutSec  = 400
 WantedBy=multi-user.target
 ' >/etc/systemd/system/node_checker.service 
 
+####firewall-cmd --permanent --zone=public --add-port=5000/tcp
+
+adduser osrm -s /sbin/nologin >/usr/local/bin/node_checker 2>>/root/install.err
+
+echo '[Unit]
+Description=g-Booking Routing Machine
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/osrm-routed --algorithm=MLD --max-table-size=10000  /gbooking/g-booking-server/osrm/britain-and-ireland-latest.osrm
+User=osrm
+Group=osrm
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
+' >/etc/systemd/system/osrm_routed.service
+
+
 systemctl daemon-reload  >>/root/install.log 2>>/root/install.err
 systemctl enable node_checker >>/root/install.log 2>>/root/install.err
 
