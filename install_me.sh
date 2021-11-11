@@ -120,11 +120,10 @@ cd /root
 #chmod 555 /usr/local/bin/gdown.pl 
 
 echo "Download MariaDB"
-rm -f mariadb-10.6.5-rhel-8-x86_64-rpms.tar 
+rm -f mariadb-10.*.tar
 wget https://storage.googleapis.com/g-booking-install/mariadb-10.6.5-rhel-8-x86_64-rpms.tar >/usr/local/bin/gdown.pl 2>>/root/install.err
 
-
-echo "Install MariaDB...."
+echo "Extracting MariaDB...."
 cd /opt
 tar -xf /root/mariadb-10.6.5-rhel-8-x86_64-rpms.tar >>/root/install.log 2>>/root/install.err
 /opt/mariadb-10.6.5-rhel-8-x86_64-rpms/setup_repository >>/root/install.log 2>>/root/install.err
