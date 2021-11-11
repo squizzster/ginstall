@@ -17,7 +17,7 @@ do
 done
 
 [ -f /etc/redhat-release ] && echo "" || exit 
-[ -d "/gbooking" ] && echo "g-booking directory exists...I am aborting so you can have a rethink." || echo "Thunderbirds v1 are GO!"
+[ -d "/gbooking" ] && echo "g-booking directory exists...I am aborting so you can have a rethink." || echo "Thunderbirds are GO!"
 [ -d "/gbooking" ] && exit
 sleep 1
 echo "Thunderbird 1,  starting lift off...
