@@ -136,15 +136,16 @@ dnf -y install MariaDB-server MariaDB-common MariaDB-s3-engine MariaDB-devel Mar
 echo "Updating system"
 systemctl enable mariadb >>/root/install.log 2>>/root/install.err
 systemctl start mariadb >>/root/install.log 2>>/root/install.err
-echo "Adding mysql";
+echo "Adding mysql_upgrade";
 nohup mysql_upgrade >>/root/install.log 2>>/root/install.err &
 
 sleep 20;
 
+echo "Securing mysql"
 echo 'RFJPUCBEQVRBQkFTRSBJRiBFWElTVFMgdGVzdDsKREVMRVRFIEZST00gbXlzcWwudXNlciBXSEVSRSBVc2VyPSdyb290JyBBTkQgSG9zdCBOT1QgSU4gKCdsb2NhbGhvc3QnLCAnMTI3LjAuMC4xJywgJzo6MScpOwpERUxFVEUgRlJPTSBteXNxbC51c2VyIFdIRVJFIFVzZXI9Jyc7CkRFTEVURSBGUk9NIG15c3FsLmRiIFdIRVJFIERiPSd0ZXN0JyBPUiBEYj0ndGVzdFxfJSc7CkZMVVNIIFBSSVZJTEVHRVM7Cgo=' | base64 -d | mysql >>/root/install.log 2>>/root/install.err
 
 echo "Adding zones";
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql >>/root/install.log 2>>/root/install.err
+mysql_tzinfo_to_sql /usr/share/zoneinfo 2>>/root/install.err | mysql -u root mysql >>/root/install.log 2>>/root/install.err
 systemctl enable firewalld  >>/root/install.log 2>>/root/install.err
 
 cd /root
@@ -207,7 +208,8 @@ WantedBy=multi-user.target
 
 ####firewall-cmd --permanent --zone=public --add-port=5000/tcp
 
-adduser osrm -s /sbin/nologin >/usr/local/bin/node_checker 2>>/root/install.err
+echo "Adding OSRM user with /sbin/nologin"
+adduser osrm -s /sbin/nologin >/usr/local/bin/node_checker 2>>/root/install.err || true
 
 echo '[Unit]
 Description=g-Booking Routing Machine
