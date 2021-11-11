@@ -16,8 +16,11 @@ do
 "
 done
 
-
-echo "g-Booking server installation started v1.4
+[ -f /etc/redhat-release ] && echo "" || exit 
+[ -d "/gbooking" ] && echo "g-booking directory exists...I am aborting so you can have a rethink." || echo "Thunderbirds are GO!"
+[ -d "/gbooking" ] && exit
+sleep 1
+echo "Thunderbird 5,  starting lift off...
 ";
 sleep 1
 
@@ -100,11 +103,6 @@ if test "$BASEDIR" != '/root'; then
 fi
 
 
-[ -f /etc/redhat-release ] && echo "" || exit 
-
-
-[ -d "/gbooking" ] && echo "g-booking directory exists...I am aborting so you can have a rethink." || echo "Thunderbirds are GO!"
-[ -d "/gbooking" ] && exit
 
 echo "Setting timezone to UTC"
 timedatectl set-timezone UTC >>/root/install.log 2>>/root/install.err
