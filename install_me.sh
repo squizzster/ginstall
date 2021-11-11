@@ -17,22 +17,17 @@ do
 done
 
 
-echo "g-Booking server installation started v1.3
+echo "g-Booking server installation started v1.4
 ";
-sleep 10
+sleep 1
 
 echo "Installing EPL release..."
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm >/root/install.log 2>/root/install.err
-sleep 3
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm >/root/install.log 2>/root/install.err
-
 echo "Installing config manager..."
 dnf -y config-manager --set-enabled powertools >>/root/install.log 2>>/root/install.err
-sleep 1
 dnf -y config-manager --set-enabled powertools >>/root/install.log 2>>/root/install.err
-
 subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms >>/root/install.log 2>>/root/install.err
-
 
 echo "Installing Boost Build"
 dnf -y install boost-build >>/root/install.log 2>>/root/install.err
@@ -127,7 +122,8 @@ cd /root
 #chmod 555 /usr/local/bin/gdown.pl 
 
 echo "Download MariaDB"
-wget -c https://storage.googleapis.com/g-booking-install/mariadb-10.6.5-rhel-8-x86_64-rpms.tar >/usr/local/bin/gdown.pl 2>>/root/install.err
+rm -f mariadb-10.6.5-rhel-8-x86_64-rpms.tar 
+wget https://storage.googleapis.com/g-booking-install/mariadb-10.6.5-rhel-8-x86_64-rpms.tar >/usr/local/bin/gdown.pl 2>>/root/install.err
 
 
 echo "Install MariaDB...."
