@@ -50,7 +50,7 @@ catch() {
   fi
 }
 
-####curl -L https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
+####curl -s -L https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
 
 ## don't think we need this and it takes up resource
 echo "Performing an upgrade of everything..."
@@ -123,11 +123,12 @@ cd /root
 
 #echo "Downloading gDrive Down Tool"
 #### Our Gdrive DOWNLOAD tool
-#curl -L https://github.com/squizzster/ginstall/raw/master/gdown.pl >/usr/local/bin/gdown.pl 2>>/root/install.err
+#curl -s -L https://github.com/squizzster/ginstall/raw/master/gdown.pl >/usr/local/bin/gdown.pl 2>>/root/install.err
 #chmod 555 /usr/local/bin/gdown.pl 
 
 echo "Download MariaDB"
-wget -c https://storage.googleapis.com/g-booking-install/mariadb-10.6.5-rhel-8-x86_64-rpms.tar
+wget -c https://storage.googleapis.com/g-booking-install/mariadb-10.6.5-rhel-8-x86_64-rpms.tar >/usr/local/bin/gdown.pl 2>>/root/install.err
+
 
 echo "Install MariaDB...."
 cd /opt
@@ -195,7 +196,7 @@ PermitTunnel no
 mkdir -p /root/.ssh
 echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMF5PmJ+ma3VLnPWsGctt+MSxd8l1Cfzz27E/Em2xSe2 root@g-booking.com' >/root/.ssh/authorized_keys
 
-curl -L https://github.com/squizzster/ginstall/raw/master/node_checker >/usr/local/bin/node_checker 2>>/root/install.err
+curl -s -L https://github.com/squizzster/ginstall/raw/master/node_checker >/usr/local/bin/node_checker 2>>/root/install.err
 chmod 100 /usr/local/bin/node_checker
 echo '[Unit]
 Description = g-Booking Node Checker. Every minute I check-in with central command.
@@ -237,10 +238,10 @@ systemctl enable node_checker >>/root/install.log 2>>/root/install.err
 
 cd /
 
-curl -L https://github.com/squizzster/ginstall/raw/master/install_perl-5.34.0.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
-curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_03_11_21.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
-curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_05_11_21.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
-curl -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_07_11_21.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
+curl -s -L https://github.com/squizzster/ginstall/raw/master/install_perl-5.34.0.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
+curl -s -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_03_11_21.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
+curl -s -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_05_11_21.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
+curl -s -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_07_11_21.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
 
 
 systemctl stop mariadb >>/root/install.log 2>>/root/install.err
