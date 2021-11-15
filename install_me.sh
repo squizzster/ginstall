@@ -32,6 +32,17 @@ dnf -y config-manager --set-enabled powertools >>/root/install.log 2>>/root/inst
 dnf -y config-manager --set-enabled powertools >>/root/install.log 2>>/root/install.err
 subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms >>/root/install.log 2>>/root/install.err
 
+echo "Disable postgres module"
+dnf -y module disable postgresql >>/root/install.log 2>>/root/install.err
+
+echo "Adding Postgres GIS rep"
+dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm >>/root/install.log 2>>/root/install.err
+export PATH=/usr/pgsql-12/bin:$PATH
+
+#echo "Installing PostGres GIS"
+#dnf -y install postgresql12-server postgresql12-contrib  postgresql12-devel postgis30_12 >>/root/install.log 2>>/root/install.err
+
+
 echo "Installing Boost Build"
 dnf -y install boost-build >>/root/install.log 2>>/root/install.err
 
