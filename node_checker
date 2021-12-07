@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
-#V1.26
-use v5.22;
+#V1.28
+use v5.23;
 use strictures 2;
 use sigtrap qw/handler handle_signal normal-signals/;
 use experimental qw/smartmatch signatures/;
@@ -14,7 +14,7 @@ use utf8::all 'GLOBAL';
 use Sys::Hostname;
 use Socket;
 use Data::Dumper;
-#use String::Random qw(random_string);
+use Data::Dump qw(dump);
 use Crypt::CBC;
 use Sereal::Encoder qw(:all);
 use Sereal::Decoder qw(:all);
@@ -22,6 +22,16 @@ use JSON::XS;
 use LWP;
 use Digest::SHA1  qw(sha1 sha1_hex sha1_base64);
 use POSIX;
+use Crypt::Digest::SHA512 qw( sha512 sha512_file );
+use Crypt::Digest::SHA256 qw( sha256  );
+use Crypt::PRNG qw( rand irand random_bytes );
+use Crypt::Mode::CBC;
+rand();
+
+my $g_aes   = Crypt::Mode::CBC->new('AES', 1, 14);
+my $g_rc6   = Crypt::Mode::CBC->new('RC6', 1, 20);
+
+
 $ENV{TZ} = 'UTC';
 tzset();
 my $encoder = Sereal::Encoder->new( { compress_threshold=>0, compress =>  SRL_ZSTD, } );
@@ -55,6 +65,9 @@ start_reload_firewall();
 my $host_name       = get_my_hostname ();
 my $my_server_ip_no = get_ipify       ();
 
+my $secrets = get_sources( 'test', 'server_config', 'server_secret', 'server_whoami', 'server_alive', 'server_temp' );
+
+
 g_message(  "Host: [$host_name].   IP: [$my_server_ip_no].");
 
 set_phase($phase);
@@ -78,7 +91,6 @@ if ( $phase == 4 ) {
  $phase = 5 if phase_4($my_server_ip_no, $host_name);
  set_phase($phase);
 }
-
 
 ## configured or not...
 ## ready for commands....
@@ -118,7 +130,7 @@ g_message ("Setting hostname to g$server_id.g-booking.com   [$ok]");
 
 
     
-$sleep_time = 59;
+$sleep_time = 10;
 
 while ( 1 == 1 ) {
   ### TEST SQL
@@ -196,11 +208,8 @@ sub phase_1 {
   # It doesn't quite do all this at the moment but it's close...   PRODCUTION PRODUCTION PRODCTION.  Finish security on this script.
   # For now, it is impossibly highly secure anyway and well beyond any possible attack in reality.
   #
-  my $cipher_who_am_i = Crypt::CBC->new(
-        -pass   => sha1($ip_no),
-        -cipher => 'Cipher::AES',
-        -pbkdf  => 'pbkdf2'
-  );
+  $secrets->{phase_1}->{secret} = substr ( sha512($ip_no), 5,  32 );  ## 32 x binary password
+  $secrets->{phase_1}->{iv}     = substr ( sha512($ip_no), 47, 16 );  ## 16 x binary IV 
   ## OK, let's say HELLO to the g G!
 
   my $command;
@@ -217,7 +226,10 @@ sub phase_1 {
 
   ## Send a HELLO COMMAND message.....
    #   /system/server/config/phase_one
-  my $response = get("https://api.g-booking.com/system/server/config/phase_one?payload=" . unpack( "H*", $cipher_who_am_i->encrypt(sereal_encode_with_object($encoder, $command))));
+  my $data_string = sereal_encode_with_object($encoder, $command);
+  my $pass_string = encrypt_aes('phase_1', $data_string);
+
+  my $response = get("https://api.g-booking.com/system/server/config/phase_one?payload=" . to_hex($pass_string));
   if ( $response->{_ok} == 400 ) {
     ## g-central command doesn't know who we are - so we cannot continue from here.... it's dead Jim.
     g_message(   "Error 400 - don't know more and nothing more I can do.");
@@ -237,11 +249,11 @@ sub phase_1 {
   my $commands;
   try {
     my $response = decode_json ($response->{_content});
-    $commands = $decoder->decode ($cipher_who_am_i->decrypt(pack("H*", $response->{message} ) ));
+    $commands = sereal_decode_with_object($decoder, decrypt_aes('phase_1', from_hex($response->{message})));
   }
   catch {
     g_message( "No command codes received in g-who-am-i message" );
-    die "No command codes";
+    die "No command codes $@";
   }
   if ( !$commands->{id} ) {
     g_message( "Command message OK but did not get my server ID back" );
@@ -600,7 +612,8 @@ sub check_in_to_config_servers {
   $check_in_command->{cpu_info} = $cpu_info if $cpu_info;
 
   if ( $check_in_command->{load_avg} >= 2.0 ) {
-    my $top_p = "/usr/bin/ps aux | sort -nrk 3,3 | head -n 20 >/tmp/cpu_top_processes_" . time();
+    my $loadint = int ($check_in_command->{load_avg});
+    my $top_p = "/usr/bin/ps aux | sort -nrk 3,3 | head -n 20 >/tmp/cpu_top_processes_$loadint";
     my $ok = system($top_p);
   }
   my $payload       =  unpack( "H*", $cipher_config->encrypt(sereal_encode_with_object($encoder, $check_in_command)) );
@@ -943,3 +956,90 @@ sub run_bench_marks {
   close FH;
   chmod 0444, "/root/.g_bench_marks.txt";
 }
+
+
+
+
+sub get_sources {
+  my @sources = @_;
+  my $secrets;
+  foreach my $source (@sources) {
+    my $secret = get_secret_file($source, "/root/.$source.secret");
+    if ( $secret ) {
+      $secrets->{$source}->{secret} = substr($secret,0,32);
+      $secrets->{$source}->{iv}     = substr($secret,32);
+    }
+    else {
+    }
+  }
+  return $secrets;
+}
+
+sub get_secret_file ($source, $file_name) {
+  if ( -e $file_name and -s $file_name == 96 ) {
+    my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, $atime,$mtime,$ctime,$blksize,$blocks) = stat($file_name);
+    if ( $nlink == 1  and  ($mode == 33024 or $mode == 32768)  and  $size == 96   and $rdev == 0 ) {
+      open(my $fh, '<', $file_name);
+      my $secret = <$fh>;
+      close $fh;
+      return from_hex($secret) if length($secret) == 96;
+    }
+    g_message( "gCrypt ignored known secret [$source] as the permissions were incorrect" );
+  }
+  g_message ( "gCrypt could not load secret [$source]." );
+  return;
+}
+
+
+sub add_source ($source, $secret) {
+  $secrets->{$source}->{secret} = substr($secret,0,32);
+  $secrets->{$source}->{iv}     = substr($secret,32);
+  return  $secrets;
+}
+
+
+
+sub encrypt_rc4 ($source, $what) {
+  try   { return RC4( "$secrets->{$source}->{secret}$secrets->{$source}->{iv}",  random_bytes(8) . $what) if $secrets->{$source}->{secret}; }
+  catch { g_message( "$@" ); }
+  return;
+}
+
+sub decrypt_rc4 ($source, $what) {
+  try   { return substr(RC4( "$secrets->{$source}->{secret}$secrets->{$source}->{iv}", $what),8) if $secrets->{$source}->{secret}; }
+  catch { g_message( "$@" ); }
+  return;
+}
+
+sub encrypt_aes ($source, $what) {
+  try   { return $g_aes->encrypt( random_bytes(8) . $what , $secrets->{$source}->{secret}, $secrets->{$source}->{iv}) if $secrets->{$source}->{secret}; }
+  catch { g_message( "$@" ); }
+  return;
+}
+sub decrypt_aes ($source, $what) {
+  try   { return substr($g_aes->decrypt($what, $secrets->{$source}->{secret}, $secrets->{$source}->{iv}),8) if $secrets->{$source}->{secret}; }
+  catch { g_message ( "$@" ); }
+  return;
+}
+
+sub encrypt_rc6 ($source, $what) {
+  try   { return $g_rc6->encrypt( random_bytes(8) . $what, $secrets->{$source}->{secret}, $secrets->{$source}->{iv}) if $secrets->{$source}->{secret}; }
+  catch { g_message ( "$@" ); }
+  return;
+}
+sub decrypt_rc6 ($source, $what) {
+  try   { return substr($g_rc6->decrypt($what, $secrets->{$source}->{secret}, $secrets->{$source}->{iv}),8) if $secrets->{$source}->{secret}; }
+  catch { g_message ( "$@" ); }
+  return;
+}
+
+
+
+sub from_hex {
+  return pack 'H*', $_[0];
+}
+
+sub to_hex {
+  return unpack("H*",  $_[0]);
+}
+
