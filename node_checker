@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-#V1.28
+#V1.30
 use v5.23;
 use strictures 2;
 use sigtrap qw/handler handle_signal normal-signals/;
@@ -135,6 +135,7 @@ $sleep_time = 10;
 while ( 1 == 1 ) {
   ### TEST SQL
   ### TEST EVERYTHING LOCALLY
+  chdir "/root";
   sd_notify(watchdog => 1, status => 'Main loop running');
   if ( check_in_to_config_servers($server_id) ) {
     sd_notify(watchdog => 1, status => "Everything OK!");
