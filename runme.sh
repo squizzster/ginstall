@@ -10,7 +10,7 @@ catch() {
     echo "Error $1 occurred on $2"
   fi
 }
-dnf -y install wget chrony firewalld tar bind-utils.x86_64 curl
+dnf -y install wget chrony firewalld tar bind-utils.x86_64 curl kpatch
 EIP=`dig emergency.g-booking.com +short`
 echo -n '<?xml version="1.0" encoding="utf-8"?>
 <zone target="DROP">
@@ -83,6 +83,7 @@ echo "Updating system"
 
 dnf -y upgrade
 dnf -y update 
+dnf -y install "kpatch-patch = $(uname -r)"
 
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 dnf -y config-manager --set-enabled powertools
