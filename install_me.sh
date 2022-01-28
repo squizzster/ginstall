@@ -19,6 +19,10 @@ echo 'CiAgICAgICAgICAgICAgICAgICAgLiAgICwtIFRvIHRoZSBNb29uIE1hcmsgIQogICAgICAgIC
 [ -f /etc/redhat-release ] && echo "" || exit 
 [ -d "/gbooking" ] && echo "g-booking directory exists...I am aborting so you can have a rethink." || echo "   LIFT OFF!"
 [ -d "/gbooking" ] && exit
+[ -d "/var/lib/mysql" ] && echo "g-booking /var/lib/mysql exists ...I am aborting so you can have a rethink." || echo "   LIFT OFF!"
+[ -d "/var/lib/mysql" ] && exit
+>/var/log/mysqld.log
+
 sleep 1
 echo "
 
