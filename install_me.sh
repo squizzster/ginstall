@@ -1,15 +1,11 @@
 #!/bin/sh
-
-
 echo "One moment...."
 sleep 1
-
 for (( c=1; c<=500; c++ ))
 do  
    echo "
 "
 done
-
 cd /root
 BASEDIR=$(pwd)
 
@@ -27,13 +23,15 @@ sleep 1
 echo "
 
 
-
 ";
 sleep 2
 
 echo "Installing EPL release..."
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm >/root/install.log 2>/root/install.err
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm >/root/install.log 2>/root/install.err
+
+echo "Installing Percona RPM..."
+dnf -y install https://repo.percona.com/yum/percona-release-latest.noarch.rpm >/root/install.log 2>/root/install.err
 
 echo "Installing config manager..."
 dnf -y config-manager --set-enabled powertools >>/root/install.log 2>>/root/install.err
@@ -52,6 +50,9 @@ export PATH=/usr/pgsql-12/bin:$PATH
 
 echo "Installing Boost Build"
 dnf -y install boost-build >>/root/install.log 2>>/root/install.err
+
+echo "Percona release setp..."
+percona-release setup -y ps80
 
 ### stuff here cannot fail....
 set -e
@@ -76,7 +77,9 @@ dnf -y upgrade >>/root/install.log 2>>/root/install.err
 #mariadb mariadb-common mariadb-devel mariadb-server mariadb-server-galera mariadb-server-utils 
 
 echo "Installing modules..."
-dnf -y install net-tools firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options mod_ssl redis  memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs cpan traceroute telnet sysbench libpng-devel zlib-devel  libgcrypt libgcrypt-devel compat-libpthread-nonshared bzip2 google-authenticator qrencode-libs bind-utils ncdu nodejs libsecret-devel gnupg1.x86_64 scl-utils gcc-toolset-9 git cmake3 zlib-devel boost-devel boost boost-devel glpk glpk-devel nload wget chrony firewalld tar bind-utils.x86_64 policycoreutils-python-utils curl kpatch >>/root/install.log 2>>/root/install.err
+dnf -y install net-tools firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options mod_ssl redis  memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs cpan traceroute telnet sysbench libpng-devel zlib-devel  libgcrypt libgcrypt-devel compat-libpthread-nonshared bzip2 google-authenticator qrencode-libs bind-utils ncdu nodejs libsecret-devel gnupg1.x86_64 scl-utils gcc-toolset-9 git cmake3 zlib-devel boost-devel boost boost-devel glpk glpk-devel nload wget chrony firewalld tar bind-utils.x86_64 policycoreutils-python-utils curl kpatch  percona-server-server percona-server-client percona-xtrabackup-80 percona-toolkit percona-mysql-shell pmm-client >>/root/install.log 2>>/root/install.err
+
+##dnf -y install percona-server-server percona-server-client percona-xtrabackup-80 percona-toolkit percona-mysql-shell pmm-client
 
 #wget ftp://ftp.pbone.net/mirror/ftp.centos.org/8.4.2105/PowerTools/x86_64/os/Packages/asio-devel-1.10.8-7.module_el8.3.0+757+d382997d.x86_64.rpm
 #dnf -y install asio-devel-1.10.8-7.module_el8.3.0+757+d382997d.x86_64.rpm
@@ -156,7 +159,14 @@ cd /root
 #echo "Securing mysql"
 #echo 'RFJPUCBEQVRBQkFTRSBJRiBFWElTVFMgdGVzdDsKREVMRVRFIEZST00gbXlzcWwudXNlciBXSEVSRSBVc2VyPSdyb290JyBBTkQgSG9zdCBOT1QgSU4gKCdsb2NhbGhvc3QnLCAnMTI3LjAuMC4xJywgJzo6MScpOwpERUxFVEUgRlJPTSBteXNxbC51c2VyIFdIRVJFIFVzZXI9Jyc7CkRFTEVURSBGUk9NIG15c3FsLmRiIFdIRVJFIERiPSd0ZXN0JyBPUiBEYj0ndGVzdFxfJSc7CkZMVVNIIFBSSVZJTEVHRVM7Cgo=' | base64 -d | mysql >>/root/install.log 2>>/root/install.err
 
-#echo "Adding zones";
+echo "Adding SQL password";
+SQL_PASSWD=$(grep "temporary password" /var/log/mysqld.log | sed 's/.*localhost: \|//')
+echo $SQL_PASSWD >/root/.mysql_temorary.secret
+echo "ALTER USER 'root'@'localhost' IDENTIFIED BY 'mySQL65536!'" | mysql --connect-expired-password --user=root --password="$(cat /root/.mysql_temorary.secret)" >>/root/install.log 2>>/root/install.err
+
+
+echo "Adding SQL zones";
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql --connect-expired-password  -u root -D mysql --password='mySQL65536!' >>/root/install.log 2>>/root/install.err
 #mysql_tzinfo_to_sql /usr/share/zoneinfo 2>>/root/install.err | mysql -u root mysql >>/root/install.log 2>>/root/install.err
 
 
