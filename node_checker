@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-#V1.31
+#V1.32
 use v5.23;
 use strictures 2;
 use sigtrap qw/handler handle_signal normal-signals/;
@@ -929,6 +929,10 @@ sub run_bench_marks {
   sd_notify(starting => 1, status => 'Cleaning DISK bench_marks...');
   my $test_dsk_c = `/usr/bin/sysbench fileio --file-total-size=2G cleanup`;
   rmdir "/g_test";
+
+  open(FH, '>', "/root/.bench_marks.txt") or die $!;
+  print FH "CPU OUTPUT:\n$test_cpu\n\nDISK OUTPUT:\n$test_dsk\nMEMORY OUTPUT:\n$test_mem";
+  close FH;
 
   if ( $test_cpu=~m/events per second:.*?([0-9]+\.[0-9][0-9])/ ) {
     #   events per second:  1273.06
