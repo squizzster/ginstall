@@ -20,12 +20,13 @@ fi
 echo 'CiAgICAgICAgICAgICAgICAgICAgLiAgICwtIFRvIHRoZSBNb29uIE1hcmsgIQogICAgICAgICAgICAgICAgICAgLicuCiAgICAgICAgICAgICAgICAgICB8b3wKICAgICAgICAgICAgICAgICAgLidvJy4KICAgICAgICAgICAgICAgICAgfC4tLnwKICAgICAgICAgICAgICAgICAgJyAgICcKICAgICAgICAgICAgICAgICAgICggKQogICAgICAgICAgICAgICAgICAgICkKICAgICAgICAgICAgICAgICAgICggKQoKICAgICAgICAgICAgICAgX19fXwogICAgICAgICAgLi0nIiJwIDhvIiJgLS4KICAgICAgIC4tJzg4ODhQJ1kuYFlbICcgYC0uCiAgICAgLCddODg4ODhiLko4b29fICAgICAgJ2AuCiAgICwnICw4ODg4ODg4ODg4OFsiICAgICAgICBZYC4KICAvICAgODg4ODg4ODg4OFAgICAgICAgICAgICBZOFwKIC8gICAgWTg4ODg4ODhQJyAgICAgICAgICAgICBdODhcCjogICAgIGBZODgnICAgUCAgICAgICAgICAgICAgYDg4ODoKOiAgICAgICBZOC5vUCAnLSA+ICAgICAgICAgICAgWTg4Ogp8ICAgICAgICAgIGBZYiAgX18gICAgICAgICAgICAgYCd8CjogICAgICAgICAgICBgJ2Q4ODg4Ym8uICAgICAgICAgIDoKOiAgICAgICAgICAgICBkODg4ODg4ODhvb28uICAgICAgOwogXCAgICAgICAgICAgIFk4ODg4ODg4ODg4OFAgICAgIC8KICBcICAgICAgICAgICAgYFk4ODg4ODg4OFAgICAgIC8KICAgYC4gICAgICAgICAgICBkODg4ODhQJyAgICAsJwogICAgIGAuICAgICAgICAgIDg4OFBQJyAgICAsJwogICAgICAgYC0uICAgICAgZDhQJyAgICAsLScgICAtZy1Cb29raW5nLQogICAgICAgICAgYC0uLCxfJ19fLCwuLScKCgogICAgICAgVEhVTkRFQklSRFMgQVJFIEdPISEK' | base64 -d
  
 [ -f /etc/redhat-release ] && echo "" || exit 
-[ -d "/gbooking" ] && echo "g-booking directory exists...I am aborting so you can have a rethink." || echo "Thunderbirds are GO!"
+[ -d "/gbooking" ] && echo "g-booking directory exists...I am aborting so you can have a rethink." || echo "   LIFT OFF!"
 [ -d "/gbooking" ] && exit
 sleep 1
 echo "
 
-Thunderbird 5,  starting lift off...
+
+
 ";
 sleep 2
 
@@ -67,13 +68,13 @@ catch() {
 ####curl -s -L https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
 
 ## don't think we need this and it takes up resource
-echo "Performing an upgrade of everything..."
+echo "Upgrading server..."
 dnf -y upgrade >>/root/install.log 2>>/root/install.err
 
 ### We install MariaDB from our own RPM now....
 #mariadb mariadb-common mariadb-devel mariadb-server mariadb-server-galera mariadb-server-utils 
 
-echo "Installing required modules..."
+echo "Installing modules..."
 dnf -y install net-tools firewalld gcc gcc-c++ make openssl-devel git libdb-devel openssl-devel rclone libaio libsepol lsof boost-program-options mod_ssl redis  memcached.x86_64 libmemcached.x86_64 libmemcached-libs.x86_64 systemd-devel systemd-libs cpan traceroute telnet sysbench libpng-devel zlib-devel  libgcrypt libgcrypt-devel compat-libpthread-nonshared bzip2 google-authenticator qrencode-libs bind-utils ncdu nodejs libsecret-devel gnupg1.x86_64 scl-utils gcc-toolset-9 git cmake3 zlib-devel boost-devel boost boost-devel glpk glpk-devel nload wget chrony firewalld tar bind-utils.x86_64 policycoreutils-python-utils curl kpatch >>/root/install.log 2>>/root/install.err
 
 #wget ftp://ftp.pbone.net/mirror/ftp.centos.org/8.4.2105/PowerTools/x86_64/os/Packages/asio-devel-1.10.8-7.module_el8.3.0+757+d382997d.x86_64.rpm
