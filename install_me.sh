@@ -174,13 +174,13 @@ chmod 000 /root/.mysql_temporary.secret
 chmod 000 /root/.mysql_root.secret
 
 SQL_PASSWD=$(grep "temporary password" /var/log/mysqld.log | sed 's/.*localhost: \|//')
-echo $SQL_PASSWD >/root/.mysql_temporary.secret
+echo $SQL_PASSWD >>/root/.mysql_temporary.secret
 
 SQL_NEW=$(openssl rand -base64 32)
-echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '$SQL_NEW'" | mysql --connect-expired-password --user=root --password="$(cat /root/.mysql_temorary.secret)" >>/root/install.log 2>>/root/install.err
+echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '$SQL_NEW'" | mysql --connect-expired-password --user=root --password="$(cat /root/.mysql_temporary.secret)" >>/root/install.log 2>>/root/install.err
 
-echo $SQL_NEW >/root/.mysql_root.secret
-rm -f /root/.mysql_temorary.secret
+echo $SQL_NEW >>/root/.mysql_root.secret
+rm -f /root/.mysql_temporary.secret
 
 echo "Adding SQL zones";
 mysql_tzinfo_to_sql /usr/share/zoneinfo  2>>/root/install.err | mysql --connect-expired-password  -u root -D mysql --password='$SQL_NEW' >>/root/install.log 2>>/root/install.err
