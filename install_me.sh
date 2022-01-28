@@ -159,11 +159,14 @@ cd /root
 #echo "Securing mysql"
 #echo 'RFJPUCBEQVRBQkFTRSBJRiBFWElTVFMgdGVzdDsKREVMRVRFIEZST00gbXlzcWwudXNlciBXSEVSRSBVc2VyPSdyb290JyBBTkQgSG9zdCBOT1QgSU4gKCdsb2NhbGhvc3QnLCAnMTI3LjAuMC4xJywgJzo6MScpOwpERUxFVEUgRlJPTSBteXNxbC51c2VyIFdIRVJFIFVzZXI9Jyc7CkRFTEVURSBGUk9NIG15c3FsLmRiIFdIRVJFIERiPSd0ZXN0JyBPUiBEYj0ndGVzdFxfJSc7CkZMVVNIIFBSSVZJTEVHRVM7Cgo=' | base64 -d | mysql >>/root/install.log 2>>/root/install.err
 
+echo "Starting SQL"
+systemctl enable mysqld >>/root/install.log 2>>/root/install.err
+systemctl start  mysqld >>/root/install.log 2>>/root/install.err
+
 echo "Adding SQL password";
 SQL_PASSWD=$(grep "temporary password" /var/log/mysqld.log | sed 's/.*localhost: \|//')
 echo $SQL_PASSWD >/root/.mysql_temorary.secret
 echo "ALTER USER 'root'@'localhost' IDENTIFIED BY 'mySQL65536!'" | mysql --connect-expired-password --user=root --password="$(cat /root/.mysql_temorary.secret)" >>/root/install.log 2>>/root/install.err
-
 
 echo "Adding SQL zones";
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql --connect-expired-password  -u root -D mysql --password='mySQL65536!' >>/root/install.log 2>>/root/install.err
