@@ -17,9 +17,9 @@ fi
 echo 'CiAgICAgICAgICAgICAgICAgICAgLiAgICwtIFRvIHRoZSBNb29uIE1hcmsgIQogICAgICAgICAgICAgICAgICAgLicuCiAgICAgICAgICAgICAgICAgICB8b3wKICAgICAgICAgICAgICAgICAgLidvJy4KICAgICAgICAgICAgICAgICAgfC4tLnwKICAgICAgICAgICAgICAgICAgJyAgICcKICAgICAgICAgICAgICAgICAgICggKQogICAgICAgICAgICAgICAgICAgICkKICAgICAgICAgICAgICAgICAgICggKQoKICAgICAgICAgICAgICAgX19fXwogICAgICAgICAgLi0nIiJwIDhvIiJgLS4KICAgICAgIC4tJzg4ODhQJ1kuYFlbICcgYC0uCiAgICAgLCddODg4ODhiLko4b29fICAgICAgJ2AuCiAgICwnICw4ODg4ODg4ODg4OFsiICAgICAgICBZYC4KICAvICAgODg4ODg4ODg4OFAgICAgICAgICAgICBZOFwKIC8gICAgWTg4ODg4ODhQJyAgICAgICAgICAgICBdODhcCjogICAgIGBZODgnICAgUCAgICAgICAgICAgICAgYDg4ODoKOiAgICAgICBZOC5vUCAnLSA+ICAgICAgICAgICAgWTg4Ogp8ICAgICAgICAgIGBZYiAgX18gICAgICAgICAgICAgYCd8CjogICAgICAgICAgICBgJ2Q4ODg4Ym8uICAgICAgICAgIDoKOiAgICAgICAgICAgICBkODg4ODg4ODhvb28uICAgICAgOwogXCAgICAgICAgICAgIFk4ODg4ODg4ODg4OFAgICAgIC8KICBcICAgICAgICAgICAgYFk4ODg4ODg4OFAgICAgIC8KICAgYC4gICAgICAgICAgICBkODg4ODhQJyAgICAsJwogICAgIGAuICAgICAgICAgIDg4OFBQJyAgICAsJwogICAgICAgYC0uICAgICAgZDhQJyAgICAsLScgICAtZy1Cb29raW5nLQogICAgICAgICAgYC0uLCxfJ19fLCwuLScKCgogICAgICAgVEhVTkRFQklSRFMgQVJFIEdPISEK' | base64 -d
  
 [ -f /etc/redhat-release ] && echo "" || exit 
-[ -d "/gbooking" ] && echo "g-booking directory exists...I am aborting so you can have a rethink." || echo "   LIFT OFF!"
+[ -d "/gbooking" ] && echo "g-booking directory exists...I am aborting so you can have a rethink." || echo "         LIFT"
 [ -d "/gbooking" ] && exit
-[ -d "/var/lib/mysql" ] && echo "g-booking /var/lib/mysql exists ...I am aborting so you can have a rethink." || echo "   LIFT OFF!"
+[ -d "/var/lib/mysql" ] && echo "g-booking /var/lib/mysql exists ...I am aborting so you can have a rethink." || echo "         OFF!"
 [ -d "/var/lib/mysql" ] && exit
 >/var/log/mysqld.log
 
@@ -173,7 +173,7 @@ echo $SQL_PASSWD >/root/.mysql_temorary.secret
 echo "ALTER USER 'root'@'localhost' IDENTIFIED BY 'mySQL65536!'" | mysql --connect-expired-password --user=root --password="$(cat /root/.mysql_temorary.secret)" >>/root/install.log 2>>/root/install.err
 
 echo "Adding SQL zones";
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql --connect-expired-password  -u root -D mysql --password='mySQL65536!' >>/root/install.log 2>>/root/install.err
+mysql_tzinfo_to_sql /usr/share/zoneinfo  2>>/root/install.err | mysql --connect-expired-password  -u root -D mysql --password='mySQL65536!' >>/root/install.log 2>>/root/install.err
 #mysql_tzinfo_to_sql /usr/share/zoneinfo 2>>/root/install.err | mysql -u root mysql >>/root/install.log 2>>/root/install.err
 
 
