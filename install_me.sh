@@ -176,7 +176,7 @@ chmod 000 /root/.mysql_root.secret
 SQL_PASSWD=$(grep "temporary password" /var/log/mysqld.log | sed 's/.*localhost: \|//')
 echo $SQL_PASSWD >/root/.mysql_temporary.secret
 
-SQL_NEW = $(openssl rand -base64 32)
+SQL_NEW=$(openssl rand -base64 32)
 echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '$SQL_NEW'" | mysql --connect-expired-password --user=root --password="$(cat /root/.mysql_temorary.secret)" >>/root/install.log 2>>/root/install.err
 
 echo $SQL_NEW >/root/.mysql_root.secret
