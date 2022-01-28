@@ -245,9 +245,9 @@ systemctl enable node_checker >>/root/install.log 2>>/root/install.err
 
 cd /
 
-encho "Installing perl...";
+echo "Installing perl...";
 curl -s -L https://github.com/squizzster/ginstall/raw/master/install_perl-5.34.0.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
-encho "Installing CPAN...";
+echo "Installing CPAN...";
 curl -s -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_03_11_21.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
 curl -s -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_05_11_21.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
 curl -s -L https://github.com/squizzster/ginstall/raw/master/cpan_only_modules_07_11_21.tar.gz | tar -zx >>/root/install.log 2>>/root/install.err
