@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
-#V1.32
-use v5.23;
+#V1.00
+use v5.24;
 use strictures 2;
 use sigtrap qw/handler handle_signal normal-signals/;
 use experimental qw/smartmatch signatures/;
@@ -390,7 +390,7 @@ sub get_my_hostname {
 sub get {
   my $url = $_[0] or return;
   my $ret = http_get($url);
-  while ( $ret->{_ok} != 200 && $ret->{_ok} != 400 ) {
+  while ( $ret->{_ok} != 200 && $ret->{_ok} != 400  &&  $ret->{_ok} != 500 ) {
     sleep 1;
     g_message( "HTTP failed. [$ret->{_ok}]  ($ret->{_msg})" );
     $ret = http_get($url);
