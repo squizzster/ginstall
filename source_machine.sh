@@ -25,11 +25,11 @@ echo "
 ";
 sleep 2
 
-echo "# MariaDB 10.6 CentOS repository list - created 2022-01-31 23:30 UTC
+echo "# MariaDB 10.7 CentOS repository list - created 2022-01-31 23:30 UTC
 # https://mariadb.org/download/
 [mariadb]
 name = MariaDB
-baseurl = https://mirrors.xtom.nl/mariadb/yum/10.6/centos8-amd64
+baseurl = https://mirrors.xtom.nl/mariadb/yum/10.7/centos8-amd64
 module_hotfixes=1
 gpgkey=https://mirrors.xtom.nl/mariadb/yum/RPM-GPG-KEY-MariaDB
 gpgcheck=1
