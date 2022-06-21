@@ -1,0 +1,6 @@
+ sh ./Configure -des \
+        -Doptimize="-O3 -pipe -fstack-protector -fno-strict-aliasing" \
+        -Dusemymalloc
+	
+
+sh ./Configure -des  -Doptimize="-O3 -pipe -fstack-protector -fno-strict-aliasing"  -Dusemymalloc	
